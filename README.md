@@ -6,7 +6,10 @@ A bridge between [EmacsSpeak](https://github.com/tvraman/emacspeak) and the [Spe
 
 ### Prerequisites
 
-  npm mathjax-node
-  npm speech-rule-engine
+You need to have a recent installation of NodeJS and npm. Then do
+
+    npm install speech-rule-engine
+    npm install mathjax-node
+    
   
   
