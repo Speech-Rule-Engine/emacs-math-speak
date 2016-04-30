@@ -11,7 +11,7 @@ You need to have a recent installation of NodeJS and npm. Then do
     npm install speech-rule-engine
     npm install mathjax-node
     
-# NVM Dances On Ubuntu 
+## NVM Dances On Ubuntu 
   
 The nvm installed by apt-get on Ubuntu (Node Version Manager) is out
 of date.
