@@ -1,18 +1,28 @@
 ;;; Currently testing!
 
 (defvar ems-node-buffer nil)
+(defvar ems-node-process nil)
 (defvar ems-output-buffer nil)
 (defvar ems-request-counter 0)
+
+(setq inferior-js-mode-hook
+      (lambda ()
+        (add-to-list
+         'comint-preoutput-filter-functions
+         (lambda (output)
+           (string-match (format "BEGINOUTPUT" ems-request-counter) output))
+           (replace-regexp-in-string "[.]*BEGINOUTPUT[0-9]+" "" output)
+           (replace-regexp-in-string "ENDOUTPUT[.]*" "" output))))
 
 (defun ems-load-node ()
   (run-js inferior-js-program-command t)
   (setq ems-node-buffer (get-buffer "*js*"))
+  (setq ems-node-process (get-buffer-process "*js*"))
   (let ((output-buffer (get-buffer "*ems-output*")))
     (if output-buffer
         (setq ems-output-buffer output-buffer)
       (setq ems-output-buffer (generate-new-buffer "*ems-output*"))
-      ))
-  (ems-erase-output))
+      )))
 
 (defun ems-load-mathjax ()
   (comint-redirect-send-command-to-process
@@ -32,7 +42,7 @@
 ;; Input: A key value
 (defun ems-move-walker (key)
   (let* ((counter (incf ems-request-counter))
-         (command (format "console.log('BEGINOUTPUT%d' + sre.move(%d) + 'ENDOUTPUT%d');"
+         (command (format "console.log('BEGINOUTPUT%d:' + sre.move(%d) + 'ENDOUTPUT%d');"
              counter key counter)))
     (comint-redirect-send-command-to-process
      command
@@ -56,13 +66,13 @@
 ;; Number.
 ;; Return: The relevant output in the buffer.
 (defun ems-parse-output-buffer (counter)
+  (accept-process-output ems-node-process 1)
   (with-current-buffer ems-output-buffer
     (let* ((str (buffer-string))
-           (result nil))
-      ;; (do* ((start (string-match (format "BEGINOUTPUT%d" counter) str))
-      ;;       (end (string-match (format "ENDOUTPUT%d" counter) str)))
-      ;;     ((and start end) (setq result (subseq str (+ start 12) end)))
-      (print (process-sentinel (get-buffer-process "*js*"))))))
+           (start (string-match (format "BEGINOUTPUT%d" counter) str))
+           (end (string-match (format "ENDOUTPUT%d" counter) str)))
+      (if (and start end) (subseq str (+ start 12) end))
+      )))
 
 
 ;;; API
@@ -71,8 +81,10 @@
 
 (defun ems-enter (expr)
   (ems-start-walker expr)
-  (ems-move-walker 2)
-  (ems-parse-output-buffer))
+  (accept-process-output (get-buffer-process "*js*") 1)
+  ;; Need to wait for callback!
+  (ems-repeat 2)
+  )
 
 (defun ems-up ()
   (ems-move-walker 38))
@@ -97,10 +109,4 @@
 
 (defun ems-stop ()
   (ems-teardown-bridge))
-
-(defun msg-me (process event)
-   (princ
-     (format "Process: %s had the event `%s'" process event)))
-
-(set-process-sentinel (get-buffer-process "*js*") 'msg-me)
 
