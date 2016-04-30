@@ -52,3 +52,16 @@ right version.
     nvm install stable 
     nvm use --delete-prefix stable --silent
 
+## API
+
+| Emacs function | Effect |
+| ---- | ---- |
+| `ems-start` | Starts the bridge to NodeJS process |
+| `ems-stop` | Stops the bridge to NodeJS process |
+| `ems-enter` | Given a string with a LaTeX expression, returns intial speech string and starts walking the expression. Make sure to sufficiently escape backslashes, that is per single backslash we need four backslashes. Does currently not work properly as the initialisation is asynchronous. |
+| `ems-up` | Walk current expression up. Return speech string or null. |
+| `ems-down` | Walk current expression down. Return speech string or null. |
+| `ems-left` | Walk current expression left. Return speech string or null. |
+| `ems-right` | Walk current expression right. Return speech string or null. |
+| `ems-repeat` | Repeat the last speech string. |
+| `ems-depth` | Return speech string with current level. |
