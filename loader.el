@@ -6,10 +6,10 @@
 (defvar ems-request-counter 0)
 
 (setq inferior-js-mode-hook
-      (lambda ()
+      #'(lambda ()
         (add-to-list
          'comint-preoutput-filter-functions
-         (lambda (output)
+         #'(lambda (output)
            (string-match (format "BEGINOUTPUT" ems-request-counter) output))
            (replace-regexp-in-string "[.]*BEGINOUTPUT[0-9]+" "" output)
            (replace-regexp-in-string "ENDOUTPUT[.]*" "" output))))
