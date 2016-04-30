@@ -4,6 +4,27 @@ A bridge between [EmacsSpeak](https://github.com/tvraman/emacspeak) and the [Spe
 
 ## Install
 
+### PrePrerequisites
+
+Install the latest version of nvm and npm
+
+    git clone https://github.com/creationix/nvm.git
+
+Move somewhere where you like it. E.g., ~/.nvm
+
+Put into your bashrc:
+
+    export NVM_DIR="/home/sorge/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" "--no-use"  # This loads nvm
+
+    nvm use --delete-prefix stable --silent
+
+Then install the latest version of node (or iojs):
+
+    nvm install stable
+
+
+
 ### Prerequisites
 
 You need to have a recent installation of NodeJS and npm. Then do
