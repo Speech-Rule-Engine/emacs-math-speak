@@ -59,10 +59,10 @@
   (with-current-buffer ems-output-buffer
     (let* ((str (buffer-string))
            (result nil))
-      (do* ((start (string-match (format "BEGINOUTPUT%d" counter) str))
-            (end (string-match (format "ENDOUTPUT%d" counter) str)))
-          ((and start end) (setq result (subseq str (+ start 12) end)))
-        (sleep-for 1)))))
+      ;; (do* ((start (string-match (format "BEGINOUTPUT%d" counter) str))
+      ;;       (end (string-match (format "ENDOUTPUT%d" counter) str)))
+      ;;     ((and start end) (setq result (subseq str (+ start 12) end)))
+      (print (process-sentinel (get-buffer-process "*js*"))))))
 
 
 ;;; API
@@ -97,4 +97,10 @@
 
 (defun ems-stop ()
   (ems-teardown-bridge))
+
+(defun msg-me (process event)
+   (princ
+     (format "Process: %s had the event `%s'" process event)))
+
+(set-process-sentinel (get-buffer-process "*js*") 'msg-me)
 
