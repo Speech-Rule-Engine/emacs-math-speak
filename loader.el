@@ -5,7 +5,8 @@
 (defvar ems-output-buffer nil)
 (defvar ems-request-counter 0)
 
-(setq inferior-js-mode-hook
+(add-hook
+ 'inferior-js-mode-hook
       #'(lambda ()
         (add-to-list
          'comint-preoutput-filter-functions
