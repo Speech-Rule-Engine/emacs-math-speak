@@ -4,6 +4,8 @@
 (defvar ems-node-process nil)
 (defvar ems-output-buffer nil)
 (defvar ems-request-counter 0)
+(defvar ems-results ())
+
 
 (add-hook
  'inferior-js-mode-hook
@@ -11,9 +13,13 @@
         (add-to-list
          'comint-preoutput-filter-functions
          #'(lambda (output)
-           (string-match (format "BEGINOUTPUT" ems-request-counter) output))
-           (replace-regexp-in-string "[.]*BEGINOUTPUT[0-9]+" "" output)
-           (replace-regexp-in-string "ENDOUTPUT[.]*" "" output))))
+             (with-current-buffer (get-buffer "*ems-output*")
+               (let ((result (ems-parse-output output)))
+                 (when result 
+                   (insert result)
+                   (insert "\n"))
+                 output))))))
+
 
 (defun ems-load-node ()
   (run-js inferior-js-program-command t)
@@ -25,37 +31,43 @@
       (setq ems-output-buffer (generate-new-buffer "*ems-output*"))
       )))
 
-(defun ems-load-mathjax ()
-  (comint-redirect-send-command-to-process
-   "var mjx = require('mathjax-node');" ems-output-buffer ems-node-buffer t))
+(defun ems-load-setup ()
+  (process-send-string 
+   ems-node-process
+   (concat 
+    "var mjx = require('mathjax-node');" 
+    "var sre = require('speech-rule-engine');"
+    "var runWithCounter = function(counter, callback, args) {"
+    "  var result = callback.apply(sre, args);"
+    "  console.log('BEGINOUTPUT' + counter + ': ' + result + ' :ENDOUTPUT');"
+    "};\n"
+    )))
 
-(defun ems-load-sre ()
-  (comint-redirect-send-command-to-process
-   "var sre = require('speech-rule-engine');" ems-output-buffer ems-node-buffer t))
 
+(defun ems-next-counter ()
+  (incf ems-request-counter))
 
 ;; Input: LaTeX expression
 (defun ems-start-walker (expr)
-  (comint-redirect-send-command-to-process
-   (format "mjx.typeset({math: '%s', format: 'TeX', mml:true}, function(data) {sre.walk(data.mml)});" expr)
-   ems-output-buffer ems-node-buffer t))
+  (process-send-string
+   ems-node-process
+   ;TODO: Here we can get LaTeX errors.
+   (concat 
+    (format "mjx.typeset({math: '%s', format: 'TeX', mml:true}, " expr)
+    (format "function(data) {sre.walk(data.mml)});\n"))))
+
 
 ;; Input: A key value
 (defun ems-move-walker (key)
-  (let* ((counter (incf ems-request-counter))
-         (command (format "console.log('BEGINOUTPUT%d:' + sre.move(%d) + 'ENDOUTPUT%d');"
-             counter key counter)))
-    (comint-redirect-send-command-to-process
-     command
-     ems-output-buffer ems-node-buffer t)
-    (ems-parse-output-buffer counter)))
+  (process-send-string
+   ems-node-process
+   (format "runWithCounter(%d, sre.move, [%d]);\n" (incf ems-request-counter) key)))
 
 
 ;; TODO Error handling after each step.
 (defun ems-setup-bridge ()
   (ems-load-node)
-  (ems-load-mathjax)
-  (ems-load-sre))
+  (ems-load-setup))
 
 (defun ems-teardown-bridge ()
   (kill-buffer ems-output-buffer)
@@ -63,17 +75,21 @@
   (setf ems-node-buffer nil))
 
 
-;; This does not work!
-;; Number.
-;; Return: The relevant output in the buffer.
-(defun ems-parse-output-buffer (counter)
-  (accept-process-output ems-node-process 1)
-  (with-current-buffer ems-output-buffer
-    (let* ((str (buffer-string))
-           (start (string-match (format "BEGINOUTPUT%d" counter) str))
-           (end (string-match (format "ENDOUTPUT%d" counter) str)))
-      (if (and start end) (subseq str (+ start 12) end))
-      )))
+;; Number: The full buffer output.
+;; Return: Cons with call number and result.
+(defun ems-parse-output (output)
+  (let* ((start (string-match "BEGINOUTPUT[0-9]+: .* :ENDOUTPUT" output)))
+    (when start
+      (let* ((rest (subseq output (+ start 11)))
+             (colon (string-match ": " rest))
+             (number (subseq rest 0 colon))
+             (rest (subseq rest (+ colon 2)))
+             (end (string-match " :ENDOUTPUT" rest))
+             (result (subseq rest 0 end)))
+        (print result)
+        (print number)
+        (push (cons (car (read-from-string number)) result) ems-results)
+        result))))
 
 
 ;;; API
