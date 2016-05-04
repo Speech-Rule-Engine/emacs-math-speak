@@ -89,16 +89,20 @@
                             (cons (cons (car (read-from-string number)) result) acc)))
       acc)))
 
+
+
 ;;; API
 (defun ems-start ()
   (ems-setup-bridge))
 
 (defun ems-enter (expr)
+  (interactive "sLaTeX: ")
   (ems-start-walker expr)
-  (accept-process-output (get-buffer-process "*js*") 1)
+  (accept-process-output (get-buffer-process "*js*") 1 nil 'just-this-one)
+  (ems-repeat)
+  (accept-process-output (get-buffer-process "*js*") 1 nil 'just-this-one)
   ;; Need to wait for callback!
-  (ems-repeat 2)
-  )
+  (dtk-speak-and-echo (cdar ems-results)))
 
 (defun ems-up ()
   (ems-move-walker 38))
