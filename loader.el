@@ -102,7 +102,8 @@
   (ems-repeat)
   (accept-process-output (get-buffer-process "*js*") 1 nil 'just-this-one)
   ;; Need to wait for callback!
-  (dtk-speak-and-echo (cdar ems-results)))
+  (when (featurep 'emacspeak)
+    (dtk-speak-and-echo (cdar ems-results))))
 
 (defun ems-up ()
   (ems-move-walker 38))
