@@ -1,4 +1,7 @@
 ;;; Currently testing!
+(require 'js-comint)
+(require 'hydra)
+(require 'emacspeak-muggles)
 
 (defvar ems-node-buffer nil)
 (defvar ems-node-process nil)
@@ -89,42 +92,57 @@
                             (cons (cons (car (read-from-string number)) result) acc)))
       acc)))
 
-
-
 ;;; API
 (defun ems-start ()
   (ems-setup-bridge))
+(defun ems-render-result ()
+  "Render current result."
+  (when (featurep 'emacspeak)
+    (dtk-speak-and-echo (cdar ems-results))))
 
 (defun ems-enter (expr)
   (interactive "sLaTeX: ")
   (ems-start-walker expr)
-  (accept-process-output (get-buffer-process "*js*") 1 nil 'just-this-one)
   (ems-repeat)
-  (accept-process-output (get-buffer-process "*js*") 1 nil 'just-this-one)
-  ;; Need to wait for callback!
-  (when (featurep 'emacspeak)
-    (dtk-speak-and-echo (cdar ems-results))))
+  (while ; drain output
+      (accept-process-output (get-buffer-process "*js*") 1 nil 'just-this-one)
+    t)
+  (ems-render-result))
 
 (defun ems-up ()
-  (ems-move-walker 38))
+  (interactive)
+  (ems-move-walker 38)
+  (ems-render-result))
 
 (defun ems-down ()
-  (ems-move-walker 40))
+  (interactive)
+  (ems-move-walker 40)
+  (ems-render-result))
 
 (defun ems-left ()
-  (ems-move-walker 37))
+  (interactive)
+  (ems-move-walker 37)
+  (ems-render-result))
 
 (defun ems-right ()
-  (ems-move-walker 39))
+  (interactive)
+  (ems-move-walker 39)
+  (ems-render-result))
 
 (defun ems-repeat ()
-  (ems-move-walker 9))
+  (interactive)
+  (ems-move-walker 9)
+  (ems-render-result))
 
 (defun ems-depth ()
-  (ems-move-walker 32))
+  (interactive)
+  (ems-move-walker 32)
+  (ems-render-result))
 
 (defun ems-exit ()
-  (ems-move-walker 27))
+  (interactive)
+  (ems-move-walker 27)
+  (ems-render-result))
 
 (defun ems-stop ()
   (ems-teardown-bridge))
@@ -138,3 +156,25 @@
   (ems-down)
   (ems-right)
   )
+
+;;; Hydra for interactive top-level call
+
+(global-set-key
+ (kbd "C-c m")
+ (defhydra emaths-explore
+   (:body-pre
+    (progn
+      (emacspeak-muggles-toggle-talkative)
+      (emacspeak-muggles-body-pre "Math"))
+    :pre emacspeak-muggles-pre
+    :post emacspeak-muggles-post)
+   "Maths"
+   ("e" ems-enter "Expr")
+   ("h" ems-left "Left")
+   ("l" ems-right  "Right")
+   ("j" ems-down "Down")
+   ("k" ems-up "Up")
+   ("x" ems-exit "Exit")
+   ("SPC" ems-depth "Depth")
+   ("C-i" ems-repeat "Repeat")
+   ("s" emacspeak-muggles-toggle-talkative "Talkative")))
