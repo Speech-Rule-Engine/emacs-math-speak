@@ -97,16 +97,17 @@
   (ems-setup-bridge))
 (defun ems-render-result ()
   "Render current result."
+  (interactive)
+  (ems-repeat)
+  (while ; drain output
+      (accept-process-output (get-buffer-process "*js*") 1 nil 'just-this-one)
+    t)
   (when (featurep 'emacspeak)
     (dtk-speak-and-echo (cdar ems-results))))
 
 (defun ems-enter (expr)
   (interactive "sLaTeX: ")
   (ems-start-walker expr)
-  (ems-repeat)
-  (while ; drain output
-      (accept-process-output (get-buffer-process "*js*") 1 nil 'just-this-one)
-    t)
   (ems-render-result))
 
 (defun ems-up ()
@@ -131,8 +132,7 @@
 
 (defun ems-repeat ()
   (interactive)
-  (ems-move-walker 9)
-  (ems-render-result))
+  (ems-move-walker 9))
 
 (defun ems-depth ()
   (interactive)
@@ -177,4 +177,5 @@
    ("x" ems-exit "Exit")
    ("SPC" ems-depth "Depth")
    ("C-i" ems-repeat "Repeat")
-   ("s" emacspeak-muggles-toggle-talkative "Talkative")))
+   ("s" emacspeak-muggles-toggle-talkative "Talkative")
+   ("." ems-render-result "Current")))
