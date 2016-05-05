@@ -73,6 +73,7 @@
 
 (defun ems-teardown-bridge ()
   (kill-buffer ems-output-buffer)
+  (setq  ems-request-counter 0)
   (setf ems-output-buffer nil)
   (setf ems-node-buffer nil))
 
@@ -129,6 +130,7 @@
 
 ;;; API
 (defun ems-start ()
+  (interactive)
   (ems-setup-bridge))
 (defun ems-render-result ()
   "Render current result."
@@ -180,6 +182,7 @@
   (ems-render-result))
 
 (defun ems-stop ()
+  (interactive)
   (ems-teardown-bridge))
 
 
