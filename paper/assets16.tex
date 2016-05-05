@@ -1,0 +1,197 @@
+%\documentclass{acm_proc_article-sp}
+\documentclass{sig-alternate}
+\usepackage{paralist}
+\usepackage{url}
+\usepackage{amsmath,amssymb}
+\usepackage{listings}
+\usepackage{tikz}
+\usepackage{color}
+\usepackage{xspace}
+\usetikzlibrary{trees}
+
+
+\newcommand\ednote[1]{\typeout{There is still an editor's note!!!}%
+  \footnote{EDNOTE: #1}}
+\newcommand\edbf[1]{\typeout{There is still an editor's note!!!}%
+  \textbf{EDNOTE: #1}}
+
+\def\collapse#1{\textcolor{blue}{\ensuremath{\mathord{\blacktriangleleft}
+\mathord{#1}
+\mathord{\blacktriangleright}}}}
+\newcommand{\latex}{\LaTeX\xspace}
+\newcommand{\sre}{SRE\xspace}
+
+% \DeclareUnicodeCharacter{B1}{\pm}
+%% LANGUAGE      Markup definitions
+\def\lstxml{
+  \lstset{language=XML,
+    basicstyle=\scriptsize,
+    keywordstyle=\bfseries\ttfamily,
+    identifierstyle=\ttfamily, 
+    % commentstyle=\color{Brown},
+    stringstyle=\ttfamily,
+    showstringspaces=false,
+    columns=[l]flexible, %% , basewidth={0.5em,0.4em}
+    escapeinside={(@*}{*@)},
+    deletekeywords={type,id}, % does not work!
+    otherkeywords={encoding,
+      mrow,math,mfrac,mi,msqrt,mo,mn,span,nobr,img,msup,maction,mtext}
+  }
+}
+\def\lsthtml{
+\lstset{language=html,
+    basicstyle=\scriptsize,
+    keywordstyle=\bfseries\ttfamily,
+    showstringspaces=false,
+    % otherkeywords={mfenced, open, close, separators, mrow, mi, mo, mn, math, 
+    %   msup, role, parent, children, added}
+}
+}
+
+\def\latex{\LaTeX}
+
+
+\begin{document}
+% \CopyrightYear{2016} 
+% \setcopyright{acmcopyright}
+% \conferenceinfo{Assets,}{}
+% \isbn{}}\acmPrice{\$15.00}
+% \doi{}
+
+
+\title{Supporting Visual Impaired Learners in Editing Mathematics}
+  
+
+\numberofauthors{3}
+\author{
+  \alignauthor {T.V. Raman}\\
+  \affaddr{Google, Inc.}\\
+  \affaddr{Mountain View, CA}\\
+  \email{\normalsize raman@google.com}
+  %
+  \alignauthor{Volker Sorge}\\
+  \affaddr{Progressive Accessibility Solutions, Ltd.}\\
+  \affaddr{University of Birmingham, UK}\\
+  \email{\normalsize V.Sorge@progressiveaccess.com}\\
+  %% Thanks does not seem to work.
+}
+
+\maketitle
+
+\begin{abstract}
+  
+  While mathematical expressions can be expressed in dedicated Braille formats,
+  these become quickly unwieldy for more advanced mathematics and moreover it
+  becomes impossible for students to communicate them to their peers or
+  professors. Consequently they need to start using a linear format that is
+  commonly understand. And indeed on transitioning from high school to
+  University students often have to learn {\LaTeX} to have a means to read
+  advanced material as well as to be able to communicate with their peers and
+  teachers.
+
+\end{abstract}
+
+\keywords{STEM Accessibility, Mathematics, MathJax}
+
+
+\enlargethispage{10pt}
+\section{Introduction}
+
+\begin{enumerate}
+\item Enable students to write and explore the math content they write.
+\item Enable student to rearrange an expression and hear the effect.
+\item Enable student to grab math content, read it, browse it and possibily
+  manipulate it.
+\end{enumerate}
+
+MathJax, a rendering library for Mathematics on the web, now offers an
+accessibility solution
+
+The main purpose of the work is therefore to support 
+
+\section{Background}
+\label{sec:background}
+
+We first give a brief introduction to the systems that are involved in our
+project.
+
+\subsection{Emacs Speak}
+\label{sec:emacs-speak}
+
+\subsection{Speech Rule Engine}
+\label{sec:sre}
+
+Speech Rule Engine (\sre) is a Javascript library that allows aural rendering of
+XML expressions given sets of speech rules that specify how speech strings are
+composed recursively via from aurally rendered subexpressions using an extended
+xpath syntax.  \sre has originally been implemented in the context of Google's
+ChromeVox screen reader~\cite{chromevox}. It has since been turned into a
+standalone, open source Javascript library, that can be installed server side
+for NodeJS applications as well as used in client side web applications.
+
+
+
+
+
+\subsection{MathJax Node}
+\label{sec:mathjax-node}
+
+MathJax is a JavaScript library that ensures flawless rendering of formulas
+across all platforms and browsers. It was originally built as a polyfill
+solution, that is, a temporary software solution until a new web standard is
+implemented in all browsers, for rendering mathematics until the web standard
+for mathematics, MathML, would be sufficiently supported.  But ten years later
+and despite MathML being part of the official HTML5 specification, the majority
+of browsers still do not support rendering of MathML natively. Hence MathJax has
+become the quasi standard for displaying Mathematics in web pages.
+The advantage of MathJax is that it can take the three most common mathematical
+authoring formats ---- {\latex}, ASCIIMath\cite{asciimath}, and MathML --- as
+input and generate high quality rendered output either as HTML or as SVG.
+
+Although MathJax is built as a client side solution, to be included into
+webpages by content authors, there is a special NodeJS package release of
+MathJax, which allows server side rendering of mathematical expressions from
+either of its three input formats. The output is either SVG or bitmap image
+formats (PNG) for legacy systems. Moreover, it allows to exploit MathJax's
+ability to convert {\latex} into standardised MathML. 
+
+MathJax node can also use \sre as a dependency to produce speech strings for
+mathematical expression for inclusion into the rendered output, either as alt
+texts for images, descriptions for SVG or via dedicated attributes into MathML.
+Furthermore, \sre has recently been integrated into MathJax in the browser,
+exploiting SRE's walker features in an effort to turn MathJax into a universal
+rendering engine, that can also provide assistive technology features such as
+aural rendering, subexpression exploration and synchronised
+highlighting\cite{w4a} on top of the visual rendering.
+
+\section{Technical Realisation}
+\label{sec:technical-realisation}
+
+\section{TTS Rendering of Mathematics}
+\label{sec:rendering}
+
+
+\section{Error Handling and Feedback}
+\label{sec:error-handling}
+
+One major difficulty presented to students new to {\LaTeX} is learning the intricacy
+
+\section{Advanced Features}
+\label{sec:error-handling}
+
+\section{User Interface and Experience}
+\label{sec:ui}
+
+\section{Conclusions}
+\label{sec:conc}
+
+\bibliographystyle{plain}
+\bibliography{assets16}
+
+\end{document}
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
