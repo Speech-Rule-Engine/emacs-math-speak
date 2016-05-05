@@ -57,7 +57,8 @@
                                         ;TODO: Here we can get LaTeX errors.
    (concat
     (format "mjx.typeset({math: '%s', format: 'TeX', mml:true}, " expr)
-    (format "function(data) {sre.walk(data.mml)});\n"))))
+    (format "function(data) {sre.walk(data.mml)});\n")
+    )))
 
 ;; Input: A key value
 (defun ems-move-walker (key)
@@ -91,6 +92,40 @@
           (ems-parse-output (subseq rest end)
                             (cons (cons (car (read-from-string number)) result) acc)))
       acc)))
+
+(defun ems-parameterize-engine (feature value)
+  (process-send-string
+   ems-node-process
+   (format "sre.setupEngine({'%s': '%s'});\n" feature value)))
+
+
+(defvar ems-domain-styles '((("default" . "chromevox") .
+                             (("default" . "verbose") ("short" . "short")))
+                            (("mathspeak" . "mathspeak") .
+                             (("default" . "verbose") ("brief" . "brief") ("sbrief" . "superbrief")))))
+(defvar ems-domain-counter 0)
+(defvar ems-style-counter 1)
+
+(defun ems-next-style ()
+  (let* ((domain (nth ems-domain-counter ems-domain-styles))
+         (style (nth (incf ems-style-counter) (cdr domain))))
+    (unless style
+      (setq ems-style-counter 0)
+      (setq style (cadr domain)))
+    (ems-parameterize-engine '(("style". (car style))))
+    (concat "style " (cdr style))))
+
+(defun ems-next-domain () 
+  (let ((domain (nth (incf ems-domain-counter) ems-domain-styles)))
+    (unless domain 
+      (setq ems-domain-counter 0)
+      (setq domain (car ems-domain-styles)))
+    (setq ems-style-counter 0)
+    (ems-parameterize-engine "domain" (caar domain))
+    (ems-parameterize-engine "style"  (caadr domain))
+    (concat "rules " (cdar domain)
+            " style " (cdadr domain))))
+
 
 ;;; API
 (defun ems-start ()
@@ -147,6 +182,17 @@
 (defun ems-stop ()
   (ems-teardown-bridge))
 
+
+(defun ems-toggle-rules ()
+  (interactive)
+  (dtk-speak-and-echo (ems-next-domain)))
+
+(defun ems-toggle-style ()
+  (interactive)
+  (dtk-speak-and-echo (ems-next-style)))
+
+
+
 (defun ems-test ()
   (ems-start)
   (ems-start-walker "\\\\frac{x}{y}")
@@ -177,5 +223,7 @@
    ("x" ems-exit "Exit")
    ("SPC" ems-depth "Depth")
    ("C-i" ems-repeat "Repeat")
+   ("d" ems-toggle-rules "Toggle Rules")
+   ("f" ems-toggle-style "Toggle Style")
    ("s" emacspeak-muggles-toggle-talkative "Talkative")
    ("." ems-render-result "Current")))
