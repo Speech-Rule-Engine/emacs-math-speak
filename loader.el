@@ -41,6 +41,7 @@
    (concat
     "var mjx = require('mathjax-node');"
     "var sre = require('speech-rule-engine');"
+    "sre.setupEngine({markup: 'acss'});"
     "var runWithCounter = function(counter, callback, args) {"
     "  var result = callback.apply(sre, args);"
     "  console.log('BEGINOUTPUT' + counter + ': ' + result + ' :ENDOUTPUT');"
@@ -100,10 +101,12 @@
    (format "sre.setupEngine({'%s': '%s'});\n" feature value)))
 
 
+;TODO: Get this structure straight from the speech rule engine.
 (defvar ems-domain-styles '((("default" . "chromevox") .
                              (("default" . "verbose") ("short" . "short")))
                             (("mathspeak" . "mathspeak") .
-                             (("default" . "verbose") ("brief" . "brief") ("sbrief" . "superbrief")))))
+                             (("default" . "verbose") ("brief" . "brief")
+                              ("sbrief" . "superbrief")))))
 (defvar ems-domain-counter 0)
 (defvar ems-style-counter 1)
 
