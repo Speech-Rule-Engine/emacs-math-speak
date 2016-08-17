@@ -1,5 +1,5 @@
 %\documentclass{acm_proc_article-sp}
-\documentclass{sig-alternate}
+\documentclass{sig-alternate-05-2015}
 \usepackage{paralist}
 \usepackage{url}
 \usepackage{amsmath,amssymb}
@@ -8,6 +8,16 @@
 \usepackage{color}
 \usepackage{xspace}
 \usetikzlibrary{trees}
+
+\CopyrightYear{2016}
+\setcopyright{rightsretained}
+\conferenceinfo{ASSETS '16}{October 23-26, 2016, Reno, NV, USA}
+\isbn{978-1-4503-4124-0/16/10}
+\doi{http://dx.doi.org/10.1145/2982142.2982212}
+
+\clubpenalty=10000 
+\widowpenalty = 10000
+
 
 
 \newcommand\ednote[1]{\typeout{There is still an editor's note!!!}%
@@ -65,10 +75,10 @@
 
 \numberofauthors{3}
 \author{
-  \alignauthor {T.V. Raman}\\
-  \affaddr{Google, Inc.}\\
-  \affaddr{Mountain View, CA}\\
-  \email{\normalsize raman@google.com}
+  % \alignauthor {T.V. Raman}\\
+  % \affaddr{Google, Inc.}\\
+  % \affaddr{Mountain View, CA}\\
+  % \email{\normalsize raman@google.com}
   %
   \alignauthor{Volker Sorge}\\
   \affaddr{Progressive Accessibility Solutions, Ltd.}\\
@@ -80,7 +90,7 @@
 \maketitle
 
 \begin{abstract}
-  We present an extension to the Emacsspeak audio desktop that provides support
+  We present an extension to the Emacspeak audio desktop that provides support
   for editing mathematics in {\LaTeX}. It integrates MathJax and the Speech Rule
   Engine to support users in reading {\LaTeX} sources, manipulating mathematical
   formulas and verifying correctness of the rendered output.
@@ -95,7 +105,7 @@
 
 Mathematics is still the single most significant hurdle for inclusive education
 for visually impaired students in the STEM subjects. In particular, in secondary
-education increasing complexity of mathematical formulas makes it harder to
+education the increasing complexity of mathematical formulas makes it harder to
 communicate content equally effectively to both sighted and blind students.
 While mathematical formulas can be expressed in dedicated Braille formats, these
 become quickly unwieldy for more advanced mathematics and moreover it becomes
@@ -107,46 +117,44 @@ advanced material.
 
 While there are some specialist editors that support editing mathematics for the
 blind (e.g.~\cite{Pearson}) there is very little support for reading or
-authoring {\LaTeX} documents directly.  In particular, it is difficult for
-students to write mathematical content in {\LaTeX} while checking that the
-rendered output indeed corresponds to the mathematical formula they intended to
-write. We aim to support this task by extending the Emacsspeak audio
-desktop~\cite{Emacsspeak} with a mathematics option. It exploits the power of
+authoring {\LaTeX} documents directly (cf.~\cite{ncbys}). In particular, it is
+difficult for students to write mathematical content in {\LaTeX} while checking
+that the rendered output indeed corresponds to the mathematical formula they
+intended to write. We aim to support this task by extending the Emacspeak audio
+desktop~\cite{Emacspeak} with a mathematics option. It exploits the power of
 MathJax~\cite{MathJax2.6} to translate {\LaTeX} expressions into MathML markup
-and the Speech Rule Engine (SRE)~\cite{SRE} to translate the MathML into speech
+and the Speech Rule Engine (SRE)~\cite{SRE} to translate MathML into speech
 strings that can be passed to a TTS.
 
-The main focus of our work is to support students in all aspects of learning,
-writing and working with {\LaTeX}. In particular, to allow them to take source
-material, read it, browse it and manipulate it. We support learning {\LaTeX} by
-making it easy to write and rearrange expressions and hear the effect, by using
-MathJax's error reporting mechanism to indicate incorrect expressions and by the
-possibility of reading expression aloud and interactively explore them on the
-fly, while editing.  As editing mathematics is already a time consuming task we
-aim to minimise the impact of having to listen to lengthy expressions multiple
-times by exploiting Emacsspeak's feature of using rich prosody and SRE's ability
-to summarise sub-expressions meaningfully for concise aural rendering of
-expressions.
+Our work focuses on supporting students in the aspects of learning, writing and
+working with {\LaTeX}. In particular, to allow them to take source material,
+read it, browse it and manipulate it. We support learning {\LaTeX} by offering
+ways to write and rearrange expressions and hear the effect, by using MathJax's
+error reporting mechanism to indicate incorrect expressions and by enabling
+interactive exploration of rendered expressions on the fly, while editing.  As
+editing mathematics is already a time consuming task we aim to minimise the
+impact of having to listen to lengthy expressions multiple times by exploiting
+Emacspeak's prosody feature and SRE's ability to summarise sub-expressions
+meaningfully for concise aural rendering of expressions.
 
 
 \section{Technical Realisation}
 \label{sec:background}
 
-Technically we realise our aims by combining Emacsspeak with MathJax and the
+Technically we realise our aims by combining Emacspeak with MathJax and the
 Speech Rule Engine.
 
-\textbf{Emacsspeak} is a speech interface that allows visually impaired users to
-interact independently and efficiently with the computer. Emacsspeak supports
-audio formatting via W3C's Aural CSS (ACSS), which allows it to produce rich
-aural presentations of electronic information.  For instance, syntax
-highlighting is aurally rendered by changes in voice characteristic and
-inflection. Combined with appropriate use of non-speech auditory icons this
-creates the equivalent of spatial layout, fonts, and graphical icons important
-in the visual interface. It provides rich contextual feedback and shifts some of
-the burden of listening from the cognitive to the perceptual domain.  Emacsspeak
-supports all activities in the Emacs editor, from implementing in a plethora of
-programming languages, writing documents in markup formats like markdown, org or
-{\LaTeX}, to browsing the file system and the WWW.
+\textbf{Emacspeak} is a speech interface that allows visually impaired users to
+employ the Emacs editor as the main tool for desktop activities. It supports
+tasks from implementing in different programming languages, writing documents in
+markup formats like markdown or {\LaTeX}, to browsing the file system and the
+WWW. Emacspeak uses audio formatting via W3C's Aural CSS (ACSS) to produce rich
+aural presentations of electronic information with the aim of shifting some of
+the burden of listening from the cognitive to the perceptual domain. For
+instance, syntax highlighting is aurally rendered by changes in voice
+characteristic and inflection. Combined with appropriate use of non-speech
+auditory icons this creates the equivalent of spatial layout, fonts, and
+graphical icons important in a visual interface.
 
 \textbf{Speech Rule Engine} (\sre) is a Javascript library that translates XML
 expressions into speech strings according to rules that can be specified in an
@@ -158,51 +166,50 @@ Besides the rules originally designed for the use in ChromeVox, it also has an
 implemententation of the full set of Mathspeak rules. In addition it contains a
 library for semantic interpretation and enrichment of MathML expressions, rules
 for intelligent summarisation of sub-expressions, facilities for the interactive
-exploration of mathematical expression, highlighting of DOM nodes, etc.  SRE
+exploration of mathematical expressions, highlighting of DOM nodes, etc.  SRE
 runs both in browsers as well as in NodeJS. It can be installed via Node's
 package manager npm and offers a command line interface for batch translation of
 XML expressions.
 
 
-\textbf{MathJax} is a JavaScript library that ensures flawless rendering of
-formulas across all platforms and browsers. It was originally built as a
-polyfill solution for rendering mathematics in browsers until the MathML
-standard would be sufficiently supported. But since the majority of browsers
-still does not support MathML natively, MathJax has become the quasi standard
-for displaying Mathematics on the web.  MathJax can render the most common
-mathematical authoring formats ---- {\latex}, ASCIIMath, and MathML --- into
-high quality output represented either as HTML or as SVG.  Although MathJax is
-built as a client side solution, to be included into webpages, there is a
-special NodeJS package release, which allows server side rendering of
-mathematical expressions in one of the three input formats into SVG. In
-addition, it offers a way to convert {\latex} into standardised MathML. MathJax
-can also use \sre as a dependency to produce speech strings for mathematical
-expression for inclusion into the rendered output.
+\textbf{MathJax} is a JavaScript library for visual rendering of formulas across
+all platforms and browsers. It was originally built as a polyfill solution for
+rendering mathematics in browsers until the MathML standard would be
+sufficiently supported. But since most browsers still do not support MathML
+natively, MathJax has become the quasi standard for displaying Mathematics on
+the web.  MathJax can render the most common mathematical authoring formats ----
+{\latex}, ASCIIMath, and MathML --- into high quality output represented either
+as HTML or as SVG.  Although MathJax is built as a client side solution, to be
+included into webpages, there is a special NodeJS package release, which allows
+server side rendering of mathematical expressions from one of the three input
+formats into SVG. In addition, it offers a way to convert {\latex} into
+standardised MathML. MathJax can also use \sre as a dependency to produce speech
+strings for mathematical expression for inclusion into the rendered output.
 
 \textbf{NodeJS Bridge:} The three systems are combined with a simple NodeJS
 bridge, whereby MathJax and \sre run within an inferior JavaScript process in
-Emacs. Emacsspeak communicates with both systems by message passing
+Emacs. Emacspeak communicates with both systems by message passing
 between the different Emacs processes.  Using an inferior process over a simple
 batch process integration does not only decrease potential lag due to delay in
 system startup but also has the advantage that both integrated systems can keep
-in independent internal state Emacsspeak can refer to.
+an independent internal state Emacspeak can refer to.
 
 
 
-\section{Reading {\LaTeX} in Emacsspeak}
+\section{Reading {\LaTeX} in Emacspeak}
 \label{sec:rendering}
 
-{\LaTeX} formulas are spoken in Emacsspeak in two different ways: Either
+{\LaTeX} formulas are spoken in Emacspeak in two different ways: Either
 integrated into the continuous flow when the entire document is read or
 speaking can be triggered interactively for a single formula. In either case
-Emacsspeak detects the math delimiters and sends the expression to the node
+Emacspeak detects the math delimiters and sends the expression to the node
 process. MathJax then translates it into MathML and passes it to \sre, which in
 turn performs a semantic analysis of the expression and then translates the
 expression into a speech string using a chosen set of speech rules.
 
 % \paragraph{Audio Formatting}
 
-One of Emacsspeak's strength is that it enables audio formatting, by employing
+One of Emacspeak's features is that it enables audio formatting, by employing
 changes in prosody (e.g., changes in pitch or stress), to indicate syntax
 highlighting, special text elements like links etc. Similarly, \sre supports
 prosody markup by allowing speech rules to define changes in pitch, rate, volume
@@ -211,18 +218,18 @@ and by adding pauses. We combine this by translating mathematical expressions in
 and superscripts or positions in fractions with changes in pitch and rate,
 rather then employing more verbose indicator words like StartFraction or
 EndFraction. \sre then returns translated formulas as sexpressions that contain
-speech strings together with Aural CSS markup that Emacsspeak can exploit for
+speech strings together with Aural CSS markup that Emacspeak can exploit for
 audio formatting.
 
 % \paragraph{Interactive Exploration}
 
-Since mathematical formulas are generally of a complex nature and just listening
-to an expression once is generally not enough for a user to fully take in its
-meaning.  It is particularly important to be able to engage with them
+Since mathematical formulas are often of a complex nature and just listening to
+an expression once is generally not enough for a user to fully take in its
+meaning, it is particularly important to be able to engage with them
 interactively by offering a means of traversing sub-expressions.  \sre provides
 a number o different navigation options for mathematical expressions, which we
-exploit from Emacsspeak. Thereby \sre keeps an internal state on the latest
-mathematical formula that it has rendered. Emacsspeak then allows users to walk
+exploit from Emacspeak. Thereby \sre keeps an internal state on the latest
+mathematical formula that it has rendered. Emacspeak then allows users to walk
 this formula using simple cursor key navigation, while \sre produces speech
 strings for the corresponding sub-expressions, potentially together with
 positional information, such as denominator, numerator etc.
@@ -244,30 +251,38 @@ typesetting system it can return fairly detailed error reports. We expose these
 directly to the reader together with an error earcon to allow users to quickly
 understand and rectify problems in their input expressions.
 
-\textbf{Syntax Highlighting} Since {\LaTeX} implements documents rather than
-composes them in a WYSYG style, editors help users to distinguish content from
-markup using syntax highlighting. Emacsspeak can exploit its audio formatting
-achieving a similar effect, making it not only easy to separate content from
-markup but also giving the reader an indication of what layout elements markup
-would produce, such as bold type face, section headings etc. For math
-expressions audio formatting is used to indicate nesting depth of braces, giving
-a user an indication of the position within an expression they edit thus
-highlighting potential problems or errors.
+\textbf{Syntax Highlighting} Since {\LaTeX} documents are implemented rather
+than composed in a WYSYG style, editors help authors to distinguish content from
+markup using syntax highlighting. Emacspeak can exploit its audio formatting to
+achieve a similar effect, making it possible to separate content from markup and
+giving the reader an indication of what layout elements markup would produce,
+such as bold type face, section headings etc. For math expressions audio
+formatting is used to indicate nesting depth of braces, giving a user an
+indication of the position within an expression they edit thus highlighting
+potential problems or errors.
 
 
-\textbf{Increased Editing Speed} Since editing {\LaTeX} can be a time consuming
+\textbf{Minimise Aural Rendering} Since editing {\LaTeX} can be a time consuming
 task, which is only compounded by the need to listen to lengthy audio output of
-mathematics, one of our main goals is to decrease the burden of listening.  One
-way is by prefering rich audio formatting of more verbose tranditional reading
+mathematics, one of our main goals is to decrease the burden of listening. One
+way is by prefering rich audio formatting to more verbose traditional reading
 styles of mathematics (cf.~MathSpeak for example). A second way is by exploiting
-the summarisation features \sre provides. For example, instead of reading out an
-entire expression in detail \sre can use its semantic interpretation to produce
+the summarisation features \sre provides. For example, instead of reading a
+complete expression, \sre can use its semantic interpretation to produce
 summaries such as ``sum with 5 summands'', which are only expanded when
-explicitly prompted by a user. Emacsspeak uses this during editing of single
-expressions. When the same expression is rendered multiple times, \sre can keep
-an internal state of the expression allowing it to simply summarise
-sub-expressions that have not been changed since the last editing state.
+explicitly prompted by a user, thus shortening aural output while editing.
 
+% Emacspeak uses this during editing of single
+% expressions.
+
+% When the same expression is rendered multiple times, \sre can keep
+% an internal state of the expression allowing it to simply summarise
+% sub-expressions that have not been changed since the last editing state.
+
+\subsection*{Acknowledgements}
+
+The author is grateful for TV Raman's technical work on the Emacspeak
+integration.
 
 \bibliographystyle{plain}
 \bibliography{assets16}
