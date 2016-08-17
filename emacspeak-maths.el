@@ -67,22 +67,19 @@
 ;;}}}
 ;;{{{ Customizations And Variables:
 
-
-
-
-(defvar ems-node-buffer nil
+(defvar emacspeak-maths-node-buffer nil
   "Buffer that holds NodeJS inferior process.")
 
-(defvar ems-node-process
+(defvar emacspeak-maths-node-process
   "Inferior NodeJS process handle."nil)
 
-(defvar ems-output-buffer nil
+(defvar emacspeak-maths-output-buffer nil
   "Buffer for holding math output.")
 
-(defvar ems-request-counter 0
+(defvar emacspeak-maths-request-counter 0
   "Counter tracking output from NodeJS.")
 
-(defvar ems-results ()
+(defvar emacspeak-maths-results ()
   "S-expression received from Node.")
 
 
@@ -96,7 +93,35 @@
   :group 'emacspeak-maths)
 
 ;;}}}
+;;{{{ Process Filter:
 
+(defun emacspeak-maths-comint-filter (output)
+  "Process output filter."
+  (declare (special emacspeak-maths-output-buffer emacspeak-maths-results))
+  (with-current-buffer (get-buffer emacspeak-maths-output-buffer)
+    (let ((result (emacspeak-maths-parse-output output)))
+      (cond
+       (result
+        (setq emacspeak-maths-results (append result emacspeak-maths-results))
+        (mapc
+         #'(lambda (x)
+             (insert (cdr x))
+             (insert "\n"))
+         result))
+      output)))
+
+;;}}}
+;;{{{ Setup:
+(defun emacspeak-maths-start-node ()
+  "Start up Node as a comint sub-process."
+  (declare (special emacspeak-maths-inferior-program emacspeak-maths-node-buffer))
+  (setq emacspeak-maths-node-buffer(make-comint emacspeak-maths-inferior-program))
+  (setq emacspeak-maths-node-process (get-buffer-process emacspeak-maths-node-buffer))
+  (add-hook 'comint-preoutput-filter-functions #'emacspeak-maths-comint-filter))
+
+
+
+;;}}}
 (provide 'emacspeak-maths)
 ;;{{{ end of file
 
