@@ -65,3 +65,41 @@ right version.
 | `ems-right` | Walk current expression right. Return speech string or null. |
 | `ems-repeat` | Repeat the last speech string. |
 | `ems-depth` | Return speech string with current level. |
+
+## Volker's JS Interaction Setup ##
+
+If   you want to start up node and load a script. That can done by executing
+require('/path/to/init.js');
+at the repl prompt.
+
+There are a few ways of running scripts/commands from the shell.
+Directly with the -e option
+node -e 'var foo = 2; var bar = 3; console.log(foo + bar);'
+Run a script file with node, e.g.,
+node init.js
+The problem with both options is that they quit the repl even with a -i option.
+
+
+For the ansi colors, I have hacked a replace function. Here's my
+.emacs code for including node. I then normally run it just with
+run-js
+
+(require 'js-comint)
+(setq inferior-js-program-command "nodejs")
+
+    (setq inferior-js-mode-hook
+          (lambda ()
+            ;; We like nice colors
+            (ansi-color-for-comint-mode-on)
+            (add-to-list
+             'comint-redirect-filter-functions
+             (lambda (output)
+               (replace-regexp-in-string "\033\\[[0-9]+[A-Z]>" "" output)))
+            ;; Deal with some prompt nonsense
+            (add-to-list
+             'comint-preoutput-filter-functions
+             (lambda (output)
+               (replace-regexp-in-string "\033\\[[0-9]+[A-Z]" "" output)))))
+
+
+
