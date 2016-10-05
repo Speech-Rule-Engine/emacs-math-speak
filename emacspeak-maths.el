@@ -1,4 +1,4 @@
-;;; emacspeak-maths.el --- Speak Mathematics 
+;;; emacspeak-maths.el --- Speak Mathematics -*-lexical-binding: t
 ;;; $Author: tv.raman.tv, zorkov  $
 ;;; Description:  Speak MathML and LaTeX math expressions 
 ;;; Keywords: Emacspeak,  Audio Desktop maths
@@ -55,7 +55,7 @@
 ;;}}}
 ;;{{{  Required modules
 
-(require 'cl-lib)
+(eval-when-compile (require 'cl))
 (declaim  (optimize  (safety 0) (speed 3)))
 ;(require 'emacspeak-preamble)
 
@@ -68,7 +68,8 @@
 ;;{{{ Customizations And Variables:
 
 (defgroup emacspeak-maths nil
-  "Customize Emacspeak  Maths.")
+  "Customize Emacspeak  Maths."
+  :group 'emacspeak)
 
 (defcustom emacspeak-maths-inferior-program
   (or (executable-find "node")
@@ -93,6 +94,20 @@ results ; s-expression  received from node
 ;;}}}
 ;;{{{ Process Filter:
 
+(defun emacspeak-maths-parse-output (output &optional acc)
+  (let* ((start (string-match "BEGINOUTPUT[0-9]+: .* :ENDOUTPUT" output)))
+    (if start
+        (let* ((rest (cl-subseq output (+ start 11)))
+               (colon (string-match ": " rest))
+               (number (cl-subseq rest 0 colon))
+               (rest (cl-subseq rest (+ colon 2)))
+               (end (string-match " :ENDOUTPUT" rest))
+               (result (cl-subseq rest 0 end)))
+          ;;(push (cons (car (read-from-string number)) result) ems-results)
+          (emacspeak-maths-parse-output (cl-subseq rest end)
+                                        (cons (cons (car (read-from-string number)) result) acc)))
+      acc)))
+
 (defun emacspeak-maths-comint-filter (output)
   "Process output filter."
   (declare (special emacspeak-maths))
@@ -114,11 +129,11 @@ results ; s-expression  received from node
 (defun emacspeak-maths-start-node ()
   "Start up Node as a comint sub-process."
   (declare (special emacspeak-maths-inferior-program emacspeak-maths))
-  (let ((comint (make-comint emacspeak-maths-inferior-program)))
+  (let ((comint (make-comint "*Maths*" emacspeak-maths-inferior-program)))
     (setf emacspeak-maths
           (make-emacspeak-maths
            :buffer comint
-           :process (get-buffer-process buffer)))
+           :process (get-buffer-process comint)))
     (with-current-buffer comint
       (add-hook 'comint-preoutput-filter-functions #'emacspeak-maths-comint-filter))))
 
