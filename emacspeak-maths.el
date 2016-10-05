@@ -85,7 +85,7 @@ Default value uses the version of `node' set configured via NVM."
   process ; node process handle 
 output ; where output is displayed
 counter ; request counter
-results ; s-expression  received from node
+results ; s-expressions  received from node
 )
 
 (defvar emacspeak-maths nil
@@ -94,37 +94,39 @@ results ; s-expression  received from node
 ;;}}}
 ;;{{{ Process Filter:
 
-(defun emacspeak-maths-parse-output (output &optional acc)
-  (when (and output(stringp output))
-    (let* ((start (string-match "BEGINOUTPUT[0-9]+: .* :ENDOUTPUT" output)))
-    (if start
-        (let* ((rest (cl-subseq output (+ start 11)))
-               (colon (string-match ": " rest))
-               (number (cl-subseq rest 0 colon))
-               (rest (cl-subseq rest (+ colon 2)))
-               (end (string-match " :ENDOUTPUT" rest))
-               (result (cl-subseq rest 0 end)))
-          ;;(push (cons (car (read-from-string number)) result) ems-results)
-          (and output
-               (emacspeak-maths-parse-output (cl-subseq rest end)
-                                        (cons (cons (car (read-from-string number)) result) acc))))
-      acc))))
+(defun emacspeak-maths-parse-output ()
+  "Parse and return one complete chunk of output."
+   ;;; return first sexp and move point
+    (read (current-buffer)))
 
-(defun emacspeak-maths-comint-filter (output)
-  "Process output filter."
-  (declare (special emacspeak-maths))
-  (when (and output (stringp output))
-    (with-current-buffer (get-buffer (emacspeak-maths-output emacspeak-maths))
-    (let ((result (emacspeak-maths-parse-output output)))
-      (when result 
-        (setf (emacspeak-maths-results emacspeak-maths)
-              (append result (emacspeak-maths-results emacspeak-maths)))
-        (mapc
-         #'(lambda (x)
-             (insert (cdr x))
-             (insert "\n"))
-         result)
-        output)))))
+(defun emacspeak-maths-process-filter (proc string)
+  "Handle process output from Node."
+  (with-current-buffer (process-buffer proc)
+    (let ((moving (= (point) (process-mark proc))))
+      (save-excursion
+        ;; Insert the text, advancing the process marker.
+        (goto-char (process-mark proc))
+        (insert string)
+        (set-marker (process-mark proc) (point)))
+;;; Consume process output 
+      (save-excursion
+        (goto-char (point-min))
+        (flush-lines "^ *$")
+        (goto-char (point-min))
+        (skip-syntax-forward " >")
+        (let((result nil)
+             (start (point)))
+          (condition-case nil
+              (while (not (eobp))
+;;; parse here
+                (setq result (emacspeak-maths-parse-output string))
+                (setf (emacspeak-maths-results emacspeak-maths)
+                      (append (emacspeak-maths-results emacspeak-maths) result))
+                (skip-syntax-forward " >")
+                (delete-region start (point))
+                (setq start (point)))
+            (error nil))))
+      (if moving (goto-char (process-mark proc))))))
 
 ;;}}}
 ;;{{{ Setup:
