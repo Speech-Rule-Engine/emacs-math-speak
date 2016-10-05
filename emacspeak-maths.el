@@ -67,58 +67,60 @@
 ;;}}}
 ;;{{{ Customizations And Variables:
 
-(defvar emacspeak-maths-node-buffer nil
-  "Buffer that holds NodeJS inferior process.")
-
-(defvar emacspeak-maths-node-process
-  "Inferior NodeJS process handle."nil)
-
-(defvar emacspeak-maths-output-buffer nil
-  "Buffer for holding math output.")
-
-(defvar emacspeak-maths-request-counter 0
-  "Counter tracking output from NodeJS.")
-
-(defvar emacspeak-maths-results nil
-  "S-expression received from Node.")
-
-
 (defgroup emacspeak-maths nil
   "Customize Emacspeak  Maths.")
 
 (defcustom emacspeak-maths-inferior-program
-  (executable-find "node")
-  "Location of `node' executable."
+  (or (executable-find "node")
+      (expand-file-name "~/.nvm/versions/node/v6.4.0/bin/node"))
+  "Location of `node' executable.
+Default value uses the version of `node' set configured via NVM."
   :type 'string
   :group 'emacspeak-maths)
+
+
+(cl-defstruct emacspeak-maths
+  buffer ; comint buffer 
+  process ; node process handle 
+output ; where output is displayed
+counter ; request counter
+results ; s-expression  received from node
+)
+
+(defvar emacspeak-maths nil
+  "Structure holding all runtime context.")
 
 ;;}}}
 ;;{{{ Process Filter:
 
 (defun emacspeak-maths-comint-filter (output)
   "Process output filter."
-  (declare (special emacspeak-maths-output-buffer emacspeak-maths-results))
-  (with-current-buffer (get-buffer emacspeak-maths-output-buffer)
+  (declare (special emacspeak-maths))
+  (with-current-buffer (get-buffer (emacspeak-maths-output emacspeak-maths))
     (let ((result (emacspeak-maths-parse-output output)))
-      (cond
-       (result
-        (setq emacspeak-maths-results (append result emacspeak-maths-results))
+      (when result 
+        (setf (emacspeak-maths-results emacspeak-maths)
+              (append result (emacspeak-maths-results emacspeak-maths)))
         (mapc
          #'(lambda (x)
              (insert (cdr x))
              (insert "\n"))
-         result))
-      output)))
+         result)
+        output))))
 
 ;;}}}
 ;;{{{ Setup:
 
 (defun emacspeak-maths-start-node ()
   "Start up Node as a comint sub-process."
-  (declare (special emacspeak-maths-inferior-program emacspeak-maths-node-buffer))
-  (setq emacspeak-maths-node-buffer(make-comint emacspeak-maths-inferior-program))
-  (setq emacspeak-maths-node-process (get-buffer-process emacspeak-maths-node-buffer))
-  (add-hook 'comint-preoutput-filter-functions #'emacspeak-maths-comint-filter))
+  (declare (special emacspeak-maths-inferior-program emacspeak-maths))
+  (let ((comint (make-comint emacspeak-maths-inferior-program)))
+    (setf emacspeak-maths
+          (make-emacspeak-maths
+           :buffer comint
+           :process (get-buffer-process buffer)))
+    (with-current-buffer comint
+      (add-hook 'comint-preoutput-filter-functions #'emacspeak-maths-comint-filter))))
 
 ;;}}}
 (provide 'emacspeak-maths)
