@@ -95,7 +95,8 @@ results ; s-expression  received from node
 ;;{{{ Process Filter:
 
 (defun emacspeak-maths-parse-output (output &optional acc)
-  (let* ((start (string-match "BEGINOUTPUT[0-9]+: .* :ENDOUTPUT" output)))
+  (when (and output(stringp output))
+    (let* ((start (string-match "BEGINOUTPUT[0-9]+: .* :ENDOUTPUT" output)))
     (if start
         (let* ((rest (cl-subseq output (+ start 11)))
                (colon (string-match ": " rest))
@@ -104,14 +105,16 @@ results ; s-expression  received from node
                (end (string-match " :ENDOUTPUT" rest))
                (result (cl-subseq rest 0 end)))
           ;;(push (cons (car (read-from-string number)) result) ems-results)
-          (emacspeak-maths-parse-output (cl-subseq rest end)
-                                        (cons (cons (car (read-from-string number)) result) acc)))
-      acc)))
+          (and output
+               (emacspeak-maths-parse-output (cl-subseq rest end)
+                                        (cons (cons (car (read-from-string number)) result) acc))))
+      acc))))
 
 (defun emacspeak-maths-comint-filter (output)
   "Process output filter."
   (declare (special emacspeak-maths))
-  (with-current-buffer (get-buffer (emacspeak-maths-output emacspeak-maths))
+  (when (and output (stringp output))
+    (with-current-buffer (get-buffer (emacspeak-maths-output emacspeak-maths))
     (let ((result (emacspeak-maths-parse-output output)))
       (when result 
         (setf (emacspeak-maths-results emacspeak-maths)
@@ -121,21 +124,37 @@ results ; s-expression  received from node
              (insert (cdr x))
              (insert "\n"))
          result)
-        output))))
+        output)))))
 
 ;;}}}
 ;;{{{ Setup:
+(defvar emacspeak-maths--init
+  (concat
+    "var mjx = require('mathjax-node');"
+    "var sre = require('speech-rule-engine');"
+    "sre.setupEngine({markup: 'acss'});"
+    "var runWithCounter = function(counter, callback, args) {"
+    "  var result = callback.apply(sre, args);"
+    "  console.log('BEGINOUTPUT' + counter + ': ' + result + ' :ENDOUTPUT');"
+    "};\n")
+  "Initialization code we send the node process on startup.")
 
-(defun emacspeak-maths-start-node ()
+(defun emacspeak-maths-start ()
   "Start up Node as a comint sub-process."
-  (declare (special emacspeak-maths-inferior-program emacspeak-maths))
-  (let ((comint (make-comint "*Maths*" emacspeak-maths-inferior-program)))
+  (declare (special emacspeak-maths-inferior-program emacspeak-maths
+                    emacspeak-maths--init))
+  (let ((comint (make-comint "Maths" emacspeak-maths-inferior-program)))
     (setf emacspeak-maths
           (make-emacspeak-maths
+           :output (get-buffer-create "*Spoken Math*")
            :buffer comint
            :process (get-buffer-process comint)))
     (with-current-buffer comint
-      (add-hook 'comint-preoutput-filter-functions #'emacspeak-maths-comint-filter))))
+      (add-hook 'comint-preoutput-filter-functions #'emacspeak-maths-comint-filter)
+      )
+   (process-send-string
+   (emacspeak-maths-process emacspeak-maths)
+   emacspeak-maths--init)))
 
 ;;}}}
 (provide 'emacspeak-maths)
@@ -147,3 +166,4 @@ results ; s-expression  received from node
 ;;; end:
 
 ;;}}}
+
