@@ -119,7 +119,7 @@ results ; s-expressions  received from node
           (condition-case nil
               (while (not (eobp))
 ;;; parse here
-                (setq result (emacspeak-maths-parse-output string))
+                (setq result (emacspeak-maths-parse-output))
                 (setf (emacspeak-maths-results emacspeak-maths)
                       (append (emacspeak-maths-results emacspeak-maths) result))
                 (skip-syntax-forward " >")
