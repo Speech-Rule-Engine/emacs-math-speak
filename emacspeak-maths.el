@@ -100,7 +100,7 @@ All complete chunks of output are consumed. Partial output is left for next run.
   (with-current-buffer (process-buffer proc)
     (let ((moving (= (point) (process-mark proc))))
       (save-excursion
-        ;; Insert the text, advancing the process marker.
+;;; Insert the text, advancing the process marker.
         (goto-char (process-mark proc))
         (insert string)
         (set-marker (process-mark proc) (point)))
@@ -116,8 +116,7 @@ All complete chunks of output are consumed. Partial output is left for next run.
               (while (not (eobp))
 ;;; Parse one complete chunk
                 (setq result (emacspeak-maths-parse-output))
-                (message "Got: %s" result)
-                ;;; Todo: reverse later depending on how we use it.
+;;; Todo: reverse later depending on how we use it.
                 (push result (emacspeak-maths-results emacspeak-maths)) 
                 (skip-syntax-forward " >")
                 (delete-region start (point))
