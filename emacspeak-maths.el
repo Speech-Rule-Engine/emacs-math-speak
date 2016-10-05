@@ -1,6 +1,6 @@
 ;;; emacspeak-maths.el --- Speak Mathematics -*-lexical-binding: t
 ;;; $Author: tv.raman.tv, zorkov  $
-;;; Description:  Speak MathML and LaTeX math expressions 
+;;; Description:  Speak MathML and LaTeX math expressions
 ;;; Keywords: Emacspeak,  Audio Desktop maths
 ;;{{{  LCD Archive entry:
 
@@ -41,14 +41,12 @@
 
 ;;; Commentary:
 
-
 ;;; Spoken mathematics on the emacspeak audio desktop.
 ;;; Use a NodeJS based speech-rule-engine for Mathematics as the backend
 ;;; for processing mathematical markup.
 ;;; The result of this processing is an annotated S-expression that is rendered via Emacspeak's speech  facilities.
 ;;; Annotations  follow Aural CSS as implemented in Emacspeak,
 ;;; This allows us to map these expressions to aural properties supported by specific TTS engines.
-
 
 ;;; Code:
 
@@ -57,10 +55,7 @@
 
 (eval-when-compile (require 'cl))
 (declaim  (optimize  (safety 0) (speed 3)))
-;(require 'emacspeak-preamble)
-
-
-
+                                        ;(require 'emacspeak-preamble)
 (require 'comint)
 (require 'derived)
 
@@ -79,14 +74,13 @@ Default value uses the version of `node' set configured via NVM."
   :type 'string
   :group 'emacspeak-maths)
 
-
 (cl-defstruct emacspeak-maths
-  buffer ; comint buffer 
-  process ; node process handle 
-output ; where output is displayed
-counter ; request counter
-results ; s-expressions  received from node
-)
+  buffer ; comint buffer
+  process ; node process handle
+  output ; where output is displayed
+  counter ; request counter
+  results ; s-expressions  received from node
+  )
 
 (defvar emacspeak-maths nil
   "Structure holding all runtime context.")
@@ -97,10 +91,12 @@ results ; s-expressions  received from node
 (defun emacspeak-maths-parse-output ()
   "Parse and return one complete chunk of output."
    ;;; return first sexp and move point
-    (read (current-buffer)))
+  (read (current-buffer)))
 
 (defun emacspeak-maths-process-filter (proc string)
-  "Handle process output from Node."
+  "Handle process output from Node.
+All complete chunks of output are consumed. Partial output is left for next run."
+  (declare (special emacspeak-maths))
   (with-current-buffer (process-buffer proc)
     (let ((moving (= (point) (process-mark proc))))
       (save-excursion
@@ -108,7 +104,7 @@ results ; s-expressions  received from node
         (goto-char (process-mark proc))
         (insert string)
         (set-marker (process-mark proc) (point)))
-;;; Consume process output 
+;;; Consume process output
       (save-excursion
         (goto-char (point-min))
         (flush-lines "^ *$")
@@ -118,10 +114,11 @@ results ; s-expressions  received from node
              (start (point)))
           (condition-case nil
               (while (not (eobp))
-;;; parse here
+;;; Parse one complete chunk
                 (setq result (emacspeak-maths-parse-output))
-                (setf (emacspeak-maths-results emacspeak-maths)
-                      (append (emacspeak-maths-results emacspeak-maths) result))
+                (message "Got: %s" result)
+                ;;; Todo: reverse later depending on how we use it.
+                (push result (emacspeak-maths-results emacspeak-maths)) 
                 (skip-syntax-forward " >")
                 (delete-region start (point))
                 (setq start (point)))
@@ -130,15 +127,16 @@ results ; s-expressions  received from node
 
 ;;}}}
 ;;{{{ Setup:
+
 (defvar emacspeak-maths--init
   (concat
-    "var mjx = require('mathjax-node');"
-    "var sre = require('speech-rule-engine');"
-    "sre.setupEngine({markup: 'acss'});"
-    "var runWithCounter = function(counter, callback, args) {"
-    "  var result = callback.apply(sre, args);"
-    "  console.log('BEGINOUTPUT' + counter + ': ' + result + ' :ENDOUTPUT');"
-    "};\n")
+   "var mjx = require('mathjax-node');"
+   "var sre = require('speech-rule-engine');"
+   "sre.setupEngine({markup: 'acss'});"
+   "var runWithCounter = function(counter, callback, args) {"
+   "  var result = callback.apply(sre, args);"
+   "  console.log('BEGINOUTPUT' + counter + ': ' + result + ' :ENDOUTPUT');"
+   "};\n")
   "Initialization code we send the node process on startup.")
 
 (defun emacspeak-maths-start ()
@@ -151,13 +149,12 @@ results ; s-expressions  received from node
            :output (get-buffer-create "*Spoken Math*")
            :buffer comint
            :process (get-buffer-process comint)))
-    (with-current-buffer comint
-      ;;; dont do this, it'll hose emacs 
-      ;(add-hook 'comint-preoutput-filter-functions #'emacspeak-maths-comint-filter)
-      )
-   (process-send-string
-   (emacspeak-maths-process emacspeak-maths)
-   emacspeak-maths--init)))
+    (set-process-filter
+     (emacspeak-maths-process emacspeak-maths)
+     #'emacspeak-maths-process-filter)
+    (process-send-string
+     (emacspeak-maths-process emacspeak-maths)
+     emacspeak-maths--init)))
 
 ;;}}}
 (provide 'emacspeak-maths)
@@ -169,4 +166,3 @@ results ; s-expressions  received from node
 ;;; end:
 
 ;;}}}
-
