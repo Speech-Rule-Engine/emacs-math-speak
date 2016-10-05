@@ -150,7 +150,8 @@ results ; s-expression  received from node
            :buffer comint
            :process (get-buffer-process comint)))
     (with-current-buffer comint
-      (add-hook 'comint-preoutput-filter-functions #'emacspeak-maths-comint-filter)
+      ;;; dont do this, it'll hose emacs 
+      ;(add-hook 'comint-preoutput-filter-functions #'emacspeak-maths-comint-filter)
       )
    (process-send-string
    (emacspeak-maths-process emacspeak-maths)
