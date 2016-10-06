@@ -13,7 +13,7 @@
 // Code:
 
 // Load the TCP Library
-net = require('net');
+var net = require('net');
 
 // Initialize Math rendering system.
 var mjx = require('mathjax-node');
@@ -42,11 +42,11 @@ handlers.enter = function (expr) {
   // Find a better alternative to passing raw kbd values.
   sre.move(9);
   return "done";
-}
+};
 
 // Implement Handlers:
 handlers.up = function () {};
-handlers.down = fucntion () {};
+handlers.down = function () {};
 handlers.left = function () {};
 handlers.right = function () {};
 handlers.repeat = function () {};
@@ -59,26 +59,31 @@ net.createServer(function (socket) {
   // Record this client:
   client = socket;
 
-  // Send a nice welcome message and announce
+  // Announce yourself:
   socket.write("Welcome " + socket.name + "\n");
-  // Handle incoming messages from Emacs:.
+  // Handle incoming messages from Emacs::
   socket.on('data', function (data) {
     respond(data, socket);
   });
 
   // Shutdown server on disconnect:
   socket.on('end', function () {
-    
     // server.shutdown();
   });
   
   // Send out response:
   function respond(message, sender ) {
-    // ToDo: write handlers for the different actions:
-    var result =handlers.enter(message);
+    // handle requests that have single argument for now:
+    var request = message.split(':');
+    var handler =handlers[request[0]];
+    if (handler != undefined) {
+    var result = handler.apply(request[1]);
     sender.write(result);
     // Debug: Log it to the server output too
     process.stdout.write(result);
+      } else {
+        process.stdout.write("Handler " + handler +"not defined. ");
+        }
   }
 
 }).listen(5000);
