@@ -73,6 +73,7 @@ net.createServer(function (socket) {
   
   // Send out response:
   function respond(message, sender ) {
+    process.stdout.write("type: " + typeof(message.value) +"\n");
     // handle requests that have single argument for now:
     var request = message.split(':');
     var handler =handlers[request[0]];
