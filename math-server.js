@@ -1,3 +1,17 @@
+//Commentary:
+
+// Expose a simple REPL as a server to emacspeak-maths.
+// Usage Model:
+// The Emacs  client sends requests of the form:
+// command: args --- where args are comma-separated.
+// The server responds with a Lisp S-expression.
+// This S-expression is an annotated string.
+// Annotations are ACSS property/value specifications.
+// At any given time, the server loop is working with a given math expression,
+// Emacs issues browse/render commands against that expression.
+
+// Code:
+
 // Load the TCP Library
 net = require('net');
 
@@ -9,6 +23,33 @@ sre.setupEngine({markup: 'acss'});
 
 // Handle to connected Emacspeak-maths client:
 var client;
+
+// table of request handlers:
+
+var handlers = {};
+
+// Add the various handlers:
+
+// Accept a LaTeX math expression:
+//Warning: this errors out.
+
+handlers.enter = function (expr) {
+  mjx.typeset({math: expr,
+               format: 'TeX',
+               mml:true},
+              function(data) {sre.walk(data.mml)}
+             );
+  // Find a better alternative to passing raw kbd values.
+  sre.move(9);
+  return "done";
+}
+
+// Implement Handlers:
+handlers.up = function () {};
+handlers.down = fucntion () {};
+handlers.left = function () {};
+handlers.right = function () {};
+handlers.repeat = function () {};
 
 // Start a TCP Server
 net.createServer(function (socket) {
@@ -34,10 +75,10 @@ net.createServer(function (socket) {
   // Send out response:
   function respond(message, sender ) {
     // ToDo: write handlers for the different actions:
-    var result ="received: " +  message;
+    var result =handlers.enter(message);
     sender.write(result);
     // Debug: Log it to the server output too
-    // process.stdout.write(result);
+    process.stdout.write(result);
   }
 
 }).listen(5000);
