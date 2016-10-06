@@ -89,7 +89,8 @@ Default value uses the version of `node' set configured via NVM."
 ;;{{{ Process Filter:
 
 (defun emacspeak-maths-parse-output ()
-  "Parse and return one complete chunk of output."
+  "Parse and return one complete chunk of output. Throws an error on an
+incomplete parse, that is expected to be caught by the caller."
    ;;; return first sexp and move point
   (read (current-buffer)))
 
