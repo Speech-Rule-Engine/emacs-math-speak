@@ -31,7 +31,7 @@ var handlers = {};
 // Add the various handlers:
 
 // Accept a LaTeX math expression:
-//Warning: this errors out.
+//Warning: this errors out in sre.move(9)
 
 handlers.enter = function (expr) {
   mjx.typeset({math: expr,
@@ -61,7 +61,7 @@ net.createServer(function (socket) {
 
   // Announce yourself:
   socket.write("Welcome " + socket.name + "\n");
-  // Handle incoming messages from Emacs::
+  // Handle incoming messages from Emacs:
   socket.on('data', function (data) {
     respond(data, socket);
   });
@@ -73,9 +73,8 @@ net.createServer(function (socket) {
   
   // Send out response:
   function respond(message, sender ) {
-    process.stdout.write("type: " + typeof(message.value) +"\n");
     // handle requests that have single argument for now:
-    var request = message.split(':');
+    var request = message.toString().split(':');
     var handler =handlers[request[0]];
     if (handler != undefined) {
     var result = handler.apply(request[1]);
@@ -83,7 +82,7 @@ net.createServer(function (socket) {
     // Debug: Log it to the server output too
     process.stdout.write(result);
       } else {
-        process.stdout.write("Handler " + handler +"not defined. ");
+        process.stdout.write("Handler for " +request[0]  +" not defined.\n ");
         }
   }
 
