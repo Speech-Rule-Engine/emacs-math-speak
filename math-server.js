@@ -20,7 +20,6 @@ var mjx = require('mathjax-node');
 var sre = require('speech-rule-engine');
 sre.setupEngine({markup: 'acss'});
 
-
 // Handle to connected Emacspeak-maths client:
 var client;
 
@@ -34,14 +33,14 @@ var handlers = {};
 //Warning: this errors out in sre.move(9)
 
 handlers.enter = function (expr) {
-  mjx.typeset({math: expr,
-               format: 'TeX',
-               mml:true},
-              function(data) {sre.walk(data.mml)}
-             );
-  // Find a better alternative to passing raw kbd values.
-  sre.move(9);
-  return "done";
+    mjx.typeset({math: expr,
+                 format: 'TeX',
+                 mml:true},
+                function(data) {sre.walk(data.mml)}
+               );
+    // Find a better alternative to passing raw kbd values.
+    sre.move(9);
+    return "done";
 };
 
 // Implement Handlers:
@@ -53,38 +52,41 @@ handlers.repeat = function () {};
 
 // Start a TCP Server
 net.createServer(function (socket) {
-  // Identify this client
-  socket.name = socket.remoteAddress + ":" + socket.remotePort 
+    // Identify this client
+    socket.name = socket.remoteAddress + ":" + socket.remotePort
 
-  // Record this client:
-  client = socket;
+    // Record this client:
+    client = socket;
 
-  // Announce yourself:
-  socket.write("Welcome " + socket.name + "\n");
-  // Handle incoming messages from Emacs:
-  socket.on('data', function (data) {
-    respond(data, socket);
-  });
+    // Announce yourself:
+    socket.write("Welcome " + socket.name + "\n");
+    // Handle incoming messages from Emacs:
+    socket.on('data', function (data) {
+        respond(data, socket);
+    });
 
-  // Shutdown server on disconnect:
-  socket.on('end', function () {
-    // server.shutdown();
-  });
-  
-  // Send out response:
-  function respond(message, sender ) {
-    // handle requests that have single argument for now:
-    var request = message.toString().split(':');
-    var handler =handlers[request[0]];
-    if (handler != undefined) {
-    var result = handler.apply(request[1]);
-    sender.write(result);
-    // Debug: Log it to the server output too
-    process.stdout.write(result);
-      } else {
-        process.stdout.write("Handler for " +request[0]  +" not defined.\n ");
+    // Shutdown server on disconnect:
+    socket.on('end', function () {
+        // server.shutdown();
+    });
+
+    // Send out response:
+    function respond(message, sender ) {
+        // handle requests that have single argument for now:
+        //FixMe: Only split on first ':'
+        var request = message.toString();
+        var cmd =request.split(':', 1)[0];
+        var args = request.slice(cmd.length+1);
+        var handler =handlers[cmd];
+        if (handler != undefined) {
+            var result = handler.apply(args);
+            sender.write(result);
+            // Debug: Log it to the server output too
+            process.stdout.write(result);
+        } else {
+            process.stdout.write("Handler for " +request[0]  +" not defined.\n ");
         }
-  }
+    }
 
 }).listen(5000);
 
