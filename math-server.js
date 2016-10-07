@@ -73,7 +73,6 @@ net.createServer(function (socket) {
     // Send out response:
     function respond(message, sender ) {
         // handle requests that have single argument for now:
-        //FixMe: Only split on first ':'
         var request = message.toString();
         var cmd =request.split(':', 1)[0];
         var args = request.slice(cmd.length+1);
