@@ -78,7 +78,7 @@ Default value uses the version of `node' set configured via NVM."
   server-buffer ; comint buffer
   server-process ; node process handle
   client-buffer ; network socket stream
-  client-process ; network connection 
+  client-process ; network connection
   output ; where output is displayed
   results
   )
@@ -119,7 +119,7 @@ All complete chunks of output are consumed. Partial output is left for next run.
 ;;; Parse one complete chunk
                 (setq result (emacspeak-maths-parse-output))
 ;;; Todo: reverse later depending on how we use it.
-                (push result (emacspeak-maths-results emacspeak-maths)) 
+                (push result (emacspeak-maths-results emacspeak-maths))
                 (skip-syntax-forward " >")
                 (delete-region start (point))
                 (setq start (point)))
@@ -129,18 +129,21 @@ All complete chunks of output are consumed. Partial output is left for next run.
 ;;}}}
 ;;{{{ Setup:
 
-
 (defvar emacspeak-maths-server-program
   (expand-file-name "math-server.js"
                     (file-name-directory (or load-file-name default-directory)))
   "NodeJS implementation of math-server.")
-
+;;;###autoload
 (defun emacspeak-maths-start ()
   "Start Node math-server, and connect to it."
+  (interactive)
   (declare (special emacspeak-maths-inferior-program
                     emacspeak-maths emacspeak-maths-server-program))
-  (let* ((server (make-comint "Maths" emacspeak-maths-inferior-program))
-         (client (open-network-stream "math" "math" "localhost" 5000)))
+  (let ((server
+         (make-comint "Server-Maths" emacspeak-maths-inferior-program nil emacspeak-maths-server-program))
+        (client nil))
+    (accept-process-output (get-buffer-process server))
+    (setq client (open-network-stream "Client-Math" "*Client-Math*" "localhost" 5000))
     (setf emacspeak-maths
           (make-emacspeak-maths
            :output (get-buffer-create "*Spoken Math*")
@@ -148,7 +151,18 @@ All complete chunks of output are consumed. Partial output is left for next run.
            :server-process (get-buffer-process server)
            :client-process client
            :client-buffer (process-buffer client)))
-    (set-process-filter client #'emacspeak-maths-process-filter)))
+    (set-process-filter client #'emacspeak-maths-process-filter)
+    (message "Started Maths server and client.")))
+
+(defun emacspeak-maths-shutdown()
+  "Shutdown math-server and client."
+  (interactive)
+  (declare (special emacspeak-maths))
+  (when (process-live-p (emacspeak-maths-client-process emacspeak-maths))
+    (delete-process (emacspeak-maths-client-process emacspeak-maths)))
+  (when (process-live-p (emacspeak-maths-server-process emacspeak-maths))
+    (delete-process (emacspeak-maths-server-process emacspeak-maths)))
+  (message "Shutdown Maths server and client."))
 
 ;;}}}
 (provide 'emacspeak-maths)
