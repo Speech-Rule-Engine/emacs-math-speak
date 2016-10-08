@@ -75,11 +75,12 @@ Default value uses the version of `node' set configured via NVM."
   :group 'emacspeak-maths)
 
 (cl-defstruct emacspeak-maths
-  buffer ; comint buffer
-  process ; node process handle
+  server-buffer ; comint buffer
+  server-process ; node process handle
+  client-buffer ; network socket stream
+  client-process ; network connection 
   output ; where output is displayed
-  counter ; request counter
-  results ; s-expressions  received from node
+  results
   )
 
 (defvar emacspeak-maths nil
@@ -95,7 +96,7 @@ incomplete parse, that is expected to be caught by the caller."
   (read (current-buffer)))
 
 (defun emacspeak-maths-process-filter (proc string)
-  "Handle process output from Node.
+  "Handle process output from Node math-server.
 All complete chunks of output are consumed. Partial output is left for next run."
   (declare (special emacspeak-maths))
   (with-current-buffer (process-buffer proc)
@@ -128,33 +129,26 @@ All complete chunks of output are consumed. Partial output is left for next run.
 ;;}}}
 ;;{{{ Setup:
 
-(defvar emacspeak-maths--init
-  (concat
-   "var mjx = require('mathjax-node');"
-   "var sre = require('speech-rule-engine');"
-   "sre.setupEngine({markup: 'acss'});"
-   "var runWithCounter = function(counter, callback, args) {"
-   "  var result = callback.apply(sre, args);"
-   "  console.log('BEGINOUTPUT' + counter + ': ' + result + ' :ENDOUTPUT');"
-   "};\n")
-  "Initialization code we send the node process on startup.")
+
+(defvar emacspeak-maths-server-program
+  (expand-file-name "math-server.js"
+                    (file-name-directory (or load-file-name default-directory)))
+  "NodeJS implementation of math-server.")
 
 (defun emacspeak-maths-start ()
-  "Start up Node as a comint sub-process."
-  (declare (special emacspeak-maths-inferior-program emacspeak-maths
-                    emacspeak-maths--init))
-  (let ((comint (make-comint "Maths" emacspeak-maths-inferior-program)))
+  "Start Node math-server, and connect to it."
+  (declare (special emacspeak-maths-inferior-program
+                    emacspeak-maths emacspeak-maths-server-program))
+  (let* ((server (make-comint "Maths" emacspeak-maths-inferior-program))
+         (client (open-network-stream "math" "math" "localhost" 5000)))
     (setf emacspeak-maths
           (make-emacspeak-maths
            :output (get-buffer-create "*Spoken Math*")
-           :buffer comint
-           :process (get-buffer-process comint)))
-    (set-process-filter
-     (emacspeak-maths-process emacspeak-maths)
-     #'emacspeak-maths-process-filter)
-    (process-send-string
-     (emacspeak-maths-process emacspeak-maths)
-     emacspeak-maths--init)))
+           :server-buffer  server
+           :server-process (get-buffer-process server)
+           :client-process client
+           :client-buffer (process-buffer client)))
+    (set-process-filter client #'emacspeak-maths-process-filter)))
 
 ;;}}}
 (provide 'emacspeak-maths)
