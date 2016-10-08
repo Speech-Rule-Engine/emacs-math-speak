@@ -67,7 +67,7 @@ net.createServer(function (socket) {
 
     // Shutdown server on disconnect:
     socket.on('end', function () {
-        // server.shutdown();
+        process.exit();
     });
 
     // Send out response:
