@@ -162,6 +162,10 @@ All complete chunks of output are consumed. Partial output is left for next run.
     (delete-process (emacspeak-maths-client-process emacspeak-maths)))
   (when (process-live-p (emacspeak-maths-server-process emacspeak-maths))
     (delete-process (emacspeak-maths-server-process emacspeak-maths)))
+  (when (buffer-live-p (emacspeak-maths-server-buffer emacspeak-maths))
+  (kill-buffer (emacspeak-maths-server-buffer emacspeak-maths)))
+  (when (buffer-live-p (emacspeak-maths-client-buffer emacspeak-maths))
+  (kill-buffer (emacspeak-maths-client-buffer emacspeak-maths)))
   (message "Shutdown Maths server and client."))
 
 ;;}}}
