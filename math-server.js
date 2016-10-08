@@ -32,7 +32,7 @@ var handlers = {};
 // Accept a LaTeX math expression:
 //Warning: this errors out in sre.move(9)
 
-handlers.enter = function (expr) {
+handlers.enter = function(expr) {
     mjx.typeset({math: expr,
                  format: 'TeX',
                  mml: true},
