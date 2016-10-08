@@ -67,6 +67,7 @@ net.createServer(function (socket) {
 
     // Shutdown server on disconnect:
     socket.on('end', function () {
+        socket.destroy();
         process.exit();
     });
 
