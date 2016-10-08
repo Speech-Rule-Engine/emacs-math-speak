@@ -35,8 +35,8 @@ var handlers = {};
 handlers.enter = function (expr) {
     mjx.typeset({math: expr,
                  format: 'TeX',
-                 mml:true},
-                function(data) {sre.walk(data.mml)}
+                 mml: true},
+                function(data) {sre.walk(data.mml); }
                );
     // Find a better alternative to passing raw kbd values.
     sre.move(9);
@@ -53,13 +53,30 @@ handlers.repeat = function () {};
 // Start a TCP Server
 net.createServer(function (socket) {
     // Identify this client
-    socket.name = socket.remoteAddress + ":" + socket.remotePort
+    socket.name = socket.remoteAddress + ":" + socket.remotePort;
 
     // Record this client:
     client = socket;
 
+// Method: respond
+    function respond(message, sender) {
+        // handle requests that have single argument for now:
+        var request = message.toString();
+        var cmd = request.split(':', 1)[0];
+        var args = request.slice(cmd.length + 1);
+        var handler = handlers[cmd];
+        if (handler !== undefined) {
+            var result = handler.apply(args);
+            sender.write(result);
+            // Debug: Log it to the server output too
+            process.stdout.write(result);
+        } else {
+            process.stdout.write("Handler for " + request[0] + " not defined.\n");
+        }
+    }
+
     // Announce yourself:
-    socket.write("Welcome " + socket.name + "\n");
+    socket.write("(Welcome " + socket.name + ")\n");
     // Handle incoming messages from Emacs:
     socket.on('data', function (data) {
         respond(data, socket);
@@ -70,23 +87,6 @@ net.createServer(function (socket) {
         socket.destroy();
         process.exit();
     });
-
-    // Send out response:
-    function respond(message, sender ) {
-        // handle requests that have single argument for now:
-        var request = message.toString();
-        var cmd =request.split(':', 1)[0];
-        var args = request.slice(cmd.length+1);
-        var handler =handlers[cmd];
-        if (handler != undefined) {
-            var result = handler.apply(args);
-            sender.write(result);
-            // Debug: Log it to the server output too
-            process.stdout.write(result);
-        } else {
-            process.stdout.write("Handler for " +request[0]  +" not defined.\n ");
-        }
-    }
 
 }).listen(5000);
 
