@@ -72,11 +72,12 @@ net.createServer(function (socket) {
             if (result !== undefined ) {
                 sender.write(result);
             } else {
-                process.stdout.write("Handler " + handler + " returned undefined. \n");
+                process.stdout.write("Handler " + cmd + " returned undefined. \n");
+            }
             } else {
                 process.stdout.write("Handler for " + request[0] + " not defined.\n");
             }
-        }
+    }
 
         // Announce yourself:
         socket.write("(Welcome " + socket.name + ")\n");
