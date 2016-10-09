@@ -169,6 +169,22 @@ All complete chunks of output are consumed. Partial output is left for next run.
   (message "Shutdown Maths server and client."))
 
 ;;}}}
+;;{{{ Navigators:
+
+(cl-loop
+ for move in
+ '("left" "right" "up" "down" "root")
+ do
+ (eval
+  `(defun ,(intern (format "emacspeak-maths-%s" move)) ()
+     ,(format "Move %s in current Math expression." move)
+     (interactive)
+     (declare (special emacspeak-maths))
+     (process-send-string
+      (emacspeak-maths-client-process emacspeak-maths)
+      ,(format "%s:\n" move)))))
+
+;;}}}
 (provide 'emacspeak-maths)
 ;;{{{ end of file
 
