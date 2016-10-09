@@ -49,8 +49,9 @@ handlers.down = function () {};
 handlers.left = function () {};
 handlers.right = function () {};
 handlers.repeat = function () {};
+handlers.root = function () {};
 
-// Start a TCP Server
+// Start a TCP Server on port 5000
 net.createServer(function (socket) {
     // Identify this client
     socket.name = socket.remoteAddress + ":" + socket.remotePort;
@@ -58,9 +59,10 @@ net.createServer(function (socket) {
     // Record this client:
     client = socket;
 
-// Method: respond
+    // Method: respond
     function respond(message, sender) {
-        // handle requests that have single argument for now:
+        // message is of the form:
+        //cmd: args, args, args
         var request = message.toString();
         var cmd = request.split(':', 1)[0];
         var args = request.slice(cmd.length + 1);
@@ -68,29 +70,28 @@ net.createServer(function (socket) {
         if (handler !== undefined) {
             var result = handler.apply(args);
             if (result !== undefined ) {
-            sender.write(result);
-                }
-            // Debug: Log it to the server output too
-            // process.stdout.write(result);
-        } else {
-            process.stdout.write("Handler for " + request[0] + " not defined.\n");
+                sender.write(result);
+            } else {
+                process.stdout.write("Handler " + handler + " returned undefined. \n");
+            } else {
+                process.stdout.write("Handler for " + request[0] + " not defined.\n");
+            }
         }
-    }
 
-    // Announce yourself:
-    socket.write("(Welcome " + socket.name + ")\n");
-    // Handle incoming messages from Emacs:
-    socket.on('data', function (data) {
-        respond(data, socket);
-    });
+        // Announce yourself:
+        socket.write("(Welcome " + socket.name + ")\n");
+        // Handle incoming messages from Emacs:
+        socket.on('data', function (data) {
+            respond(data, socket);
+        });
 
-    // Shutdown server on disconnect:
-    socket.on('end', function () {
-        socket.destroy();
-        process.exit();
-    });
+        // Shutdown server on disconnect:
+        socket.on('end', function () {
+            socket.destroy();
+            process.exit();
+        });
 
-}).listen(5000);
+    }).listen(5000);
 
-// Put a friendly message on the terminal of the server.
-console.log("Math server running at port 5000\n");
+                 // Put a friendly message on the terminal of the server.
+                 console.log("Math server running at port 5000\n");
