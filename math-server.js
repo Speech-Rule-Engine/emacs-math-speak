@@ -32,15 +32,14 @@ var handlers = {};
 // Accept a LaTeX math expression:
 //Warning: this errors out in sre.move(9)
 
-handlers.enter = function(expr) {
+handlers.enter = function(expr, socket) {
     mjx.typeset({math: expr,
                  format: 'TeX',
                  mml: true},
-                function(data) {sre.walk(data.mml); }
+                function(data) {socket.write(sre.walk(data.mml)); }
                );
     // Find a better alternative to passing raw kbd values.
-    sre.move(9);
-    return "done";
+  // sre.move(9);
 };
 
 // Implement Handlers:
@@ -68,7 +67,7 @@ net.createServer(function (socket) {
         var args = request.slice(cmd.length + 1);
         var handler = handlers[cmd];
         if (handler !== undefined) {
-            var result = handler.call(null, args);
+          var result = handler.call(null, args, socket);
             if (result !== undefined ) {
                 sender.write(result);
             } else {
