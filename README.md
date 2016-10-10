@@ -18,8 +18,10 @@ Put into your bashrc:
     [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" "--no-use"  # This loads nvm
 
     nvm use --delete-prefix stable --silent
+export NODE_DISABLE_COLORS=1
+export NODE_NO_READLINE=1
 
-Then install the latest version of node (or iojs):
+Then install the latest version of node 
 
     nvm install stable
 
@@ -32,74 +34,40 @@ You need to have a recent installation of NodeJS and npm. Then do
     npm install speech-rule-engine
     npm install mathjax-node
     
-You need the js-comint package installed for Emacs and loaded, as well as the
-inferior-js program set. For example put into your .emacs file:
 
-    (require 'js-comint)
-    (setq inferior-js-program-command "node")
 
-## NVM Dances On Ubuntu 
-  
-The nvm installed by apt-get on Ubuntu (Node Version Manager) is out
-of date.
-here are the dances I had to do to get it updated and using the
-right version.
-  
-    # .nvm holds git clone of 
-    # https://github.com/creationix/nvm.git
-    export NVM_DIR=/home/raman/.nvm
-    [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" "--no-use"  
-    nvm install stable 
-    nvm use --delete-prefix stable --silent
+## Emacs Interaction 
 
-## API
+### Test server/client 
 
+From a shell, run
+    node math-server.js
+    
+    Then from a different shell, run a client 
+        nc localhost 5000
+        
+        In this client connection, type 
+            
+                enter: a+b
+                
+                If everything works, you'll see an S-expression come
+                back.
+                
+
+### Next Run it Through Emacs
+
+     M-x load-file 
+         emacspeak-maths.el
+         
+         
 | Emacs function | Effect |
 | ---- | ---- |
-| `ems-start` | Starts the bridge to NodeJS process |
-| `ems-stop` | Stops the bridge to NodeJS process |
-| `ems-enter` | Given a string with a LaTeX expression, returns intial speech string and starts walking the expression. Make sure to sufficiently escape backslashes, that is per single backslash we need four backslashes. Does currently not work properly as the initialisation is asynchronous. |
-| `ems-up` | Walk current expression up. Return speech string or null. |
-| `ems-down` | Walk current expression down. Return speech string or null. |
-| `ems-left` | Walk current expression left. Return speech string or null. |
-| `ems-right` | Walk current expression right. Return speech string or null. |
-| `ems-repeat` | Repeat the last speech string. |
-| `ems-depth` | Return speech string with current level. |
-
-## Volker's JS Interaction Setup ##
-
-If   you want to start up node and load a script. That can done by executing
-require('/path/to/init.js');
-at the repl prompt.
-
-There are a few ways of running scripts/commands from the shell.
-Directly with the -e option
-node -e 'var foo = 2; var bar = 3; console.log(foo + bar);'
-Run a script file with node, e.g.,
-node init.js
-The problem with both options is that they quit the repl even with a -i option.
-
-
-For the ansi colors, I have hacked a replace function. Here's my
-.emacs code for including node. I then normally run it just with
-run-js
-
-(require 'js-comint)
-(setq inferior-js-program-command "nodejs")
-
-    (setq inferior-js-mode-hook
-          (lambda ()
-            ;; We like nice colors
-            (ansi-color-for-comint-mode-on)
-            (add-to-list
-             'comint-redirect-filter-functions
-             (lambda (output)
-               (replace-regexp-in-string "\033\\[[0-9]+[A-Z]>" "" output)))
-            ;; Deal with some prompt nonsense
-            (add-to-list
-             'comint-preoutput-filter-functions
-             (lambda (output)
-               (replace-regexp-in-string "\033\\[[0-9]+[A-Z]" "" output)))))
-
+| `emacspeak-start` | Starts the bridge to NodeJS process |
+| `emacspeak-shutdown` | Stops the bridge to NodeJS process |
+| `emacspeak-enter` | Given a string with a LaTeX expression, returns initial speech s-expression and starts walking the expression. |
+| `ems-up` | Walk current expression up. Return speech s-expression or null. |
+| `ems-down` | Walk current expression down. Return speech s-expression or null. |
+| `ems-left` | Walk current expression left. Return speech s-expression or null. |
+| `ems-right` | Walk current expression right. Return speech s-expression or null. |
 
 
