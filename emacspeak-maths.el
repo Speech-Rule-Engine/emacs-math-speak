@@ -171,6 +171,14 @@ All complete chunks of output are consumed. Partial output is left for next run.
 ;;}}}
 ;;{{{ Navigators:
 
+(defun emacspeak-maths-enter (latex)
+  "Send a LaTeX expression to Maths server."
+  (interactive "sLaTeX: ")
+  (declare (special emacspeak-maths))
+  (process-send-string
+   (emacspeak-maths-client-process emacspeak-maths)
+   (format "enter: %s\n"latex)))
+
 (cl-loop
  for move in
  '("left" "right" "up" "down" "root")
