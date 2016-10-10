@@ -68,7 +68,7 @@ net.createServer(function (socket) {
         var args = request.slice(cmd.length + 1);
         var handler = handlers[cmd];
         if (handler !== undefined) {
-            var result = handler.apply(args);
+            var result = handler.call(null, args);
             if (result !== undefined ) {
                 sender.write(result);
             } else {
