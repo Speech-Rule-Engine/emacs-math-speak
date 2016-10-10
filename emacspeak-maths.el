@@ -177,7 +177,7 @@ All complete chunks of output are consumed. Partial output is left for next run.
   (declare (special emacspeak-maths))
   (process-send-string
    (emacspeak-maths-client-process emacspeak-maths)
-   (format "enter: %s\n"latex)))
+   (format "enter: %s"latex)))
 
 (cl-loop
  for move in
