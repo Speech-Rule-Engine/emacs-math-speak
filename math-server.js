@@ -20,9 +20,6 @@ var mjx = require('mathjax-node');
 var sre = require('speech-rule-engine');
 sre.setupEngine({markup: 'acss'});
 
-// Handle to connected Emacspeak-maths client:
-var client;
-
 // table of request handlers:
 
 var handlers = {};
@@ -50,10 +47,7 @@ handlers.root = function () {};
 net.createServer(function (socket) {
     // Identify this client
     socket.name = socket.remoteAddress + ":" + socket.remotePort;
-
-    // Record this client:
-    client = socket;
-
+    
     // Method: respond
     function respond(message, sender) {
         // message is of the form:
