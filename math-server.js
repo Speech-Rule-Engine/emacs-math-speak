@@ -30,8 +30,6 @@ var handlers = {};
 // Add the various handlers:
 
 // Accept a LaTeX math expression:
-//Warning: this errors out in sre.move(9)
-
 handlers.enter = function(expr, socket) {
     mjx.typeset({math: expr,
                  format: 'TeX',
