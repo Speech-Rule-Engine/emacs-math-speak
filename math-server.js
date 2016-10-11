@@ -36,8 +36,6 @@ handlers.enter = function(expr, socket) {
                  mml: true},
                 function(data) {socket.write(sre.walk(data.mml)); }
                );
-    // Find a better alternative to passing raw kbd values.
-  // sre.move(9);
 };
 
 // Implement Handlers:
