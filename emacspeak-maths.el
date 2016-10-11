@@ -55,7 +55,6 @@
 
 (eval-when-compile (require 'cl))
 (declaim  (optimize  (safety 0) (speed 3)))
-                                        ;(require 'emacspeak-preamble)
 (require 'comint)
 (require 'derived)
 
@@ -191,6 +190,12 @@ All complete chunks of output are consumed. Partial output is left for next run.
      (process-send-string
       (emacspeak-maths-client-process emacspeak-maths)
       ,(format "%s:\n" move)))))
+
+;;}}}
+;;{{{ Speaking Output:
+
+;;}}}
+;;{{{ Displaying Output:
 
 ;;}}}
 (provide 'emacspeak-maths)
