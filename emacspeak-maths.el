@@ -125,11 +125,10 @@ Examine head of sexp, and applies associated handler to the tail."
   (let-alist acss-alist
     (acss-personality-from-speech-style
      (make-acss
-      :family nil
       :average-pitch  .average-pitch
       :pitch-range .pitch-range
-      :richness .richness
-      :stress .stress))))
+      :stress .stress
+      :richness .richness))))
 
 (defun emacspeak-maths-parse-text (contents)
   "Parse body of annotated text from Maths Server.
