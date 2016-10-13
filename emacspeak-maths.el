@@ -119,10 +119,17 @@ Examine head of sexp, and applies associated handler to the tail."
 (defun emacspeak-maths-parse-exp (contents)
   "Parse top-level exp returned from Maths Server."
   (mapcar #'emacspeak-maths-parse contents))
+
 (defun emacspeak-maths-acss (acss-alist)
   "Return ACSS voice corresponding to acss-alist."
-  ;;; tbd.
-  'acss-p1-s1-all)
+  (let-alist acss-alist
+    (acss-personality-from-speech-style
+     (make-acss
+      :family nil
+      :average-pitch  .average-pitch
+      :pitch-range .pitch-range
+      :richness .richness
+      :stress .stress))))
 
 (defun emacspeak-maths-parse-text (contents)
   "Parse body of annotated text from Maths Server.
