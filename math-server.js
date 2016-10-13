@@ -1,14 +1,34 @@
+// Copyright 2016 T. V. Raman, Volker Sorge
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 //Commentary:
 
-// Expose a simple REPL as a server to emacspeak-maths.
-// Usage Model:
-// The Emacs  client sends requests of the form:
-// command: args --- where args are comma-separated.
-// The server responds with a Lisp S-expression.
-// This S-expression is an annotated string.
-// Annotations are ACSS property/value specifications.
-// At any given time, the server loop is working with a given math expression,
-// Emacs issues browse/render commands against that expression.
+
+/**
+ * @fileoverview Server for connecting Emacs to the Speech-Rule-Engine.
+ * @author tv.raman.tv@gmail.com (T. V. Raman)
+ *
+ *  Expose a simple REPL as a server to emacspeak-maths.
+ *  Usage Model:
+ *  The Emacs  client sends requests of the form:
+ *  command: args --- where args are comma-separated.
+ *  The server responds with a Lisp S-expression.
+ *  This S-expression is an annotated string.
+ *  Annotations are ACSS property/value specifications.
+ *  At any given time, the server loop is working with a given math expression,
+ *  Emacs issues browse/render commands against that expression.
+ */
 
 // Code:
 
