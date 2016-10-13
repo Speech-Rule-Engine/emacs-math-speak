@@ -20,7 +20,9 @@
  * @author tv.raman.tv@gmail.com (T. V. Raman)
  *
  *  Expose a simple REPL as a server to emacspeak-maths.
+ *
  *  Usage Model:
+ *
  *  The Emacs  client sends requests of the form:
  *  command: args --- where args are comma-separated.
  *  The server responds with a Lisp S-expression.
