@@ -46,14 +46,28 @@ sre.setupEngine({markup: 'acss'});
 
 var handlers = {};
 
+// An error output function for MathJax errors.
+
+var errorOutput = function(errors, socket) {
+  socket.write(
+    errors.map(function(x) {return '(error "' + x + '")';}).join(' ')
+  );
+};
+
 // Add the various handlers:
 
 // Accept a LaTeX math expression:
 handlers.enter = function(expr, socket) {
+  mjx.config({
+    displayErrors: false,
+  });
   mjx.typeset({math: expr,
                format: 'TeX',
                mml: true},
-              function(data) {socket.write(sre.walk(data.mml)); }
+              function(data) {
+                (data.errors && data.errors.length) ?
+                  errorOutput(data.errors, socket) :
+                  socket.write(sre.walk(data.mml)); }
              );
 };
 
