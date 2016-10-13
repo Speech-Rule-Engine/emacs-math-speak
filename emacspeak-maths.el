@@ -86,6 +86,69 @@ Default value uses the version of `node' set configured via NVM."
   "Structure holding all runtime context.")
 
 ;;}}}
+;;{{{ Parser Setup:
+
+(defvar emacspeak-maths-handler-table (make-hash-table :test #'eq)
+  "Map of handlers for parsing Maths Server output.")
+(defsubst emacspeak-maths-handler-set (name handler)
+  "Set up handler for name `name'."
+  (declare (special emacspeak-maths-handler-table))
+  (puthash name handler emacspeak-maths-handler-table))
+
+(defsubst emacspeak-maths-handler-get (name)
+  "Return handler  for name `name'.
+Throw error if no handler defined."
+  (declare (special emacspeak-maths-handler-table))
+  (or (gethash name emacspeak-maths-handler-table)
+      (error "No handler defined for %s" name)))
+
+;;}}}
+;;{{{ Handlers:
+
+
+;;; All handlers are called with the body of the unit being parsed.
+
+
+(defun emacspeak-maths-parse (sexp)
+  "Top-level parser dispatch.
+Examine head of sexp, and applies associated handler to the tail."
+  (cl-assert  (listp sexp) t "%s is not a list." contents)
+  (let ((handler (emacspeak-maths-handler-get(car sexp))))
+    (cl-assert (fboundp handler) t "%s is not  a function.")
+    (mapcar handler (cdr contents))))
+    
+(defun emacspeak-maths-parse-exp (contents)
+  "Parse top-level exp returned from Maths Server."
+  (mapcar #'emacspeak-maths-parse contents))
+
+
+(defun emacspeak-maths-parse-text (contents)
+  "Parse body of annotated text from Maths Server.
+Expected: ((acss) string)."
+  (declare (special emacspeak-maths))
+  (cl-assert (listp contents) t "%s is not a list. " contents)
+  (let ((acss (cl-first contents))
+        (string (cl-second contents))
+        (start nil))
+    (with-current-buffer  (emacspeak-maths-output emacspeak-maths)
+          (setq start (goto-char (point-max)))
+          (insert string)
+          (put-text-property
+           start (point)
+           'personality (emacspeak-maths-acss acss)))))
+
+
+(defun emacspeak-maths-parse-pause (contents)
+  "Parse Pause value."
+  (declare (special emacspeak-maths))
+  (cl-assert (numberp contents) t "%s is not a number. " contents)
+    (with-current-buffer  (emacspeak-maths-output emacspeak-maths)
+      (goto-char (point-max))
+      (insert "\n")
+          (put-text-property (1- (point)) (point) 'pause contents)))
+          
+  
+;;}}}
 ;;{{{ Process Filter:
 
 (defun emacspeak-maths-parse-output ()
