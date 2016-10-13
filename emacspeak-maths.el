@@ -118,7 +118,7 @@ Examine head of sexp, and applies associated handler to the tail."
 
 (defun emacspeak-maths-parse-exp (contents)
   "Parse top-level exp returned from Maths Server."
-  (mapcar #'emacspeak-maths-parse contents))
+  (funcall #'emacspeak-maths-parse contents))
 
 (defun emacspeak-maths-acss (acss-alist)
   "Return ACSS voice corresponding to acss-alist."
