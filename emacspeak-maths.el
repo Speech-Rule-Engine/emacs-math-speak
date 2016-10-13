@@ -173,11 +173,11 @@ Expected: ((acss) string)."
 ;;}}}
 ;;{{{ Process Filter:
 
-(defun emacspeak-maths-parse-output ()
+(defun emacspeak-maths-read-output ()
   "Parse and return one complete chunk of output. Throws an error on an
 incomplete parse, that is expected to be caught by the caller."
    ;;; return first sexp and move point
-   (read (current-buffer)))
+   (emacspeak-maths-parse (read (current-buffer))))
 
 (defun emacspeak-maths-process-filter (proc string)
   "Handle process output from Node math-server.
@@ -201,7 +201,7 @@ All complete chunks of output are consumed. Partial output is left for next run.
           (condition-case nil
               (while (not (eobp))
 ;;; Parse one complete chunk
-                (setq result (emacspeak-maths-parse-output))
+                (setq result (emacspeak-maths-read-output))
 ;;; Todo: reverse later depending on how we use it.
                 (push result (emacspeak-maths-results emacspeak-maths))
                 (skip-syntax-forward " >")
