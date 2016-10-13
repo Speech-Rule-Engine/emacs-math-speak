@@ -106,6 +106,7 @@ Throw error if no handler defined."
 ;;{{{ Handlers:
 
 ;;; All handlers are called with the body of the unit being parsed.
+;;; Handlers process input and render to output buffer
 
 (defun emacspeak-maths-parse (sexp)
   "Top-level parser dispatch.
@@ -113,11 +114,15 @@ Examine head of sexp, and applies associated handler to the tail."
   (cl-assert  (listp sexp) t "%s is not a list." contents)
   (let ((handler (emacspeak-maths-handler-get(car sexp))))
     (cl-assert (fboundp handler) t "%s is not  a function.")
-    (mapcar handler (cdr sexp))))
+    (funcall handler (cdr sexp))))
 
 (defun emacspeak-maths-parse-exp (contents)
   "Parse top-level exp returned from Maths Server."
   (mapcar #'emacspeak-maths-parse contents))
+(defun emacspeak-maths-acss (acss-alist)
+  "Return ACSS voice corresponding to acss-alist."
+  ;;; tbd.
+  'acss-p1-s1-all)
 
 (defun emacspeak-maths-parse-text (contents)
   "Parse body of annotated text from Maths Server.
@@ -140,14 +145,20 @@ Expected: ((acss) string)."
   (cl-assert (numberp contents) t "%s is not a number. " contents)
   (with-current-buffer  (emacspeak-maths-output emacspeak-maths)
     (goto-char (point-max))
-    (insert "\n")
-    (put-text-property (1- (point)) (point) 'pause contents)))
+    (insert "\n ")
+    (put-text-property (1- (point)) (point) 'pause contents) ;;; make it rear-sticky
+    ))
+
+
+(defun emacspeak-maths-parse-error (contents)
+  "Display error message."
+  (message "%s" contents))
 
 ;;}}}
 ;;{{{ Map Handlers:
 (cl-loop
  for f in
- '(exp pause text)
+ '(exp pause text error)
  do
  (emacspeak-maths-handler-set f
                               (intern (format "emacspeak-maths-parse-%s"  (symbol-name f)))))
