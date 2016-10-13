@@ -110,15 +110,21 @@ Throw error if no handler defined."
 
 (defun emacspeak-maths-parse (sexp)
   "Top-level parser dispatch.
-Examine head of sexp, and applies associated handler to the tail."
-  (cl-assert  (listp sexp) t "%s is not a list." contents)
-  (let ((handler (emacspeak-maths-handler-get(car sexp))))
+If sexp is a string, return it.
+Otherwise, Examine head of sexp, and applies associated handler to the tail."
+  (cond
+   ((stringp sexp)
+    (with-current-buffer (emacspeak-maths-output emacspeak-maths)
+      (insert (format "%s\n" sexp))))
+   (t
+    (cl-assert  (listp sexp) t "%s is not a list." contents)
+    (let ((handler (emacspeak-maths-handler-get(car sexp))))
     (cl-assert (fboundp handler) t "%s is not  a function.")
-    (funcall handler (cdr sexp))))
+    (funcall handler (cdr sexp))))))
 
 (defun emacspeak-maths-parse-exp (contents)
   "Parse top-level exp returned from Maths Server."
-  (funcall #'emacspeak-maths-parse contents))
+  (mapc #'emacspeak-maths-parse contents))
 
 (defun emacspeak-maths-acss (acss-alist)
   "Return ACSS voice corresponding to acss-alist."
