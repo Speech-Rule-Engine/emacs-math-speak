@@ -24,7 +24,7 @@
  *  Usage Model:
  *
  *  The Emacs  client sends requests of the form:
- *  command: args --- where args are comma-separated.
+ *  command: arg.
  *  The server responds with a Lisp S-expression.
  *  This S-expression is an annotated string.
  *  Annotations are ACSS property/value specifications.
