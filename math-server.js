@@ -58,12 +58,12 @@ handlers.enter = function(expr, socket) {
 };
 
 // Implement Handlers:
-handlers.up = function() {};
-handlers.down = function() {};
-handlers.left = function() {};
-handlers.right = function() {};
-handlers.repeat = function() {};
-handlers.root = function() {};
+handlers.up = function() {return sre.move('UP');};
+handlers.down = function() {return sre.move('DOWN');};
+handlers.left = function() {return sre.move('LEFT');};
+handlers.right = function() {return sre.move('RIGHT');};
+handlers.repeat = function() {return sre.move('REPEAT');};
+handlers.root = function() {return sre.move('ROOT');};
 
 // Start a TCP Server on port 5000
 net.createServer(function(socket) {
