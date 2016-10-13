@@ -177,7 +177,7 @@ Expected: ((acss) string)."
   "Parse and return one complete chunk of output. Throws an error on an
 incomplete parse, that is expected to be caught by the caller."
    ;;; return first sexp and move point
-  (read (current-buffer)))
+   (read (current-buffer)))
 
 (defun emacspeak-maths-process-filter (proc string)
   "Handle process output from Node math-server.
