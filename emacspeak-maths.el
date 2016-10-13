@@ -115,7 +115,7 @@ Examine head of sexp, and applies associated handler to the tail."
   (cl-assert  (listp sexp) t "%s is not a list." contents)
   (let ((handler (emacspeak-maths-handler-get(car sexp))))
     (cl-assert (fboundp handler) t "%s is not  a function.")
-    (mapcar handler (cdr contents))))
+    (mapcar handler (cdr sexp))))
     
 (defun emacspeak-maths-parse-exp (contents)
   "Parse top-level exp returned from Maths Server."
