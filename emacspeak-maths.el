@@ -105,9 +105,7 @@ Throw error if no handler defined."
 ;;}}}
 ;;{{{ Handlers:
 
-
 ;;; All handlers are called with the body of the unit being parsed.
-
 
 (defun emacspeak-maths-parse (sexp)
   "Top-level parser dispatch.
@@ -116,11 +114,10 @@ Examine head of sexp, and applies associated handler to the tail."
   (let ((handler (emacspeak-maths-handler-get(car sexp))))
     (cl-assert (fboundp handler) t "%s is not  a function.")
     (mapcar handler (cdr sexp))))
-    
+
 (defun emacspeak-maths-parse-exp (contents)
   "Parse top-level exp returned from Maths Server."
   (mapcar #'emacspeak-maths-parse contents))
-
 
 (defun emacspeak-maths-parse-text (contents)
   "Parse body of annotated text from Maths Server.
@@ -131,23 +128,30 @@ Expected: ((acss) string)."
         (string (cl-second contents))
         (start nil))
     (with-current-buffer  (emacspeak-maths-output emacspeak-maths)
-          (setq start (goto-char (point-max)))
-          (insert string)
-          (put-text-property
-           start (point)
-           'personality (emacspeak-maths-acss acss)))))
-
+      (setq start (goto-char (point-max)))
+      (insert string)
+      (put-text-property
+       start (point)
+       'personality (emacspeak-maths-acss acss)))))
 
 (defun emacspeak-maths-parse-pause (contents)
   "Parse Pause value."
   (declare (special emacspeak-maths))
   (cl-assert (numberp contents) t "%s is not a number. " contents)
-    (with-current-buffer  (emacspeak-maths-output emacspeak-maths)
-      (goto-char (point-max))
-      (insert "\n")
-          (put-text-property (1- (point)) (point) 'pause contents)))
-          
-  
+  (with-current-buffer  (emacspeak-maths-output emacspeak-maths)
+    (goto-char (point-max))
+    (insert "\n")
+    (put-text-property (1- (point)) (point) 'pause contents)))
+
+;;}}}
+;;{{{ Map Handlers:
+(cl-loop
+ for f in
+ '(exp pause text)
+ do
+ (emacspeak-maths-handler-set f
+                              (intern (format "emacspeak-maths-parse-%s"  (symbol-name f)))))
+
 ;;}}}
 ;;{{{ Process Filter:
 
@@ -225,9 +229,9 @@ All complete chunks of output are consumed. Partial output is left for next run.
   (when (process-live-p (emacspeak-maths-server-process emacspeak-maths))
     (delete-process (emacspeak-maths-server-process emacspeak-maths)))
   (when (buffer-live-p (emacspeak-maths-server-buffer emacspeak-maths))
-  (kill-buffer (emacspeak-maths-server-buffer emacspeak-maths)))
+    (kill-buffer (emacspeak-maths-server-buffer emacspeak-maths)))
   (when (buffer-live-p (emacspeak-maths-client-buffer emacspeak-maths))
-  (kill-buffer (emacspeak-maths-client-buffer emacspeak-maths)))
+    (kill-buffer (emacspeak-maths-client-buffer emacspeak-maths)))
   (message "Shutdown Maths server and client."))
 
 ;;}}}
