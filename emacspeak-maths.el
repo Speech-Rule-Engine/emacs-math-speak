@@ -57,6 +57,7 @@
 ;;; Now you can use these keys:
 ;;;@itemize
 ;;; @item Enter: <SPC> Enter a LaTeX expression.
+;;; @item Alt-Text <a> Process alt-text under point as LaTeX.
 ;;; @item Down <down> Move down a level.
 ;;; @item Up <up> Move up a level.
 ;;; @item Left <left> Move left.
@@ -382,7 +383,20 @@ Emacs online help facility to look up help on these commands.
     (current-buffer)))
 
 ;;}}}
+;;{{{ Helpers:
+
+(defun emacspeak-maths-speak-alt ()
+  "Speak alt text as Maths.
+For use on Wikipedia pages  for example."
+  (interactive)
+  (cl-assert (eq major-mode 'eww-mode) "Not in an EWW buffer.")
+  (let ((alt-text (shr-show-alt-text)))
+    (unless (string-equal alt-text "No image under point")
+  (funcall-interactively #'emacspeak-maths-enter alt-text))))
+
+;;}}}
 ;;{{{ Muggle: Speak And Browse Math
+
 (global-set-key
  (kbd "s-SPC")
  (defhydra emacspeak-maths-navigator
@@ -391,6 +405,7 @@ Emacs online help facility to look up help on these commands.
               :post emacspeak-muggles-post)
    "Spoken Math"
    ("SPC" emacspeak-maths-enter "enter")
+   ("a" emacspeak-maths-speak-alt "Alt Text")
    ("<up>" emacspeak-maths-up "Up")
    ("<down>" emacspeak-maths-down"down")
    ("<left>" emacspeak-maths-left "left")
