@@ -42,33 +42,38 @@ var mjx = require('mathjax-node');
 var sre = require('speech-rule-engine');
 sre.setupEngine({markup: 'acss'});
 
-// table of request handlers:
+// Auxiliary methods for error handling.
+var errorGen = {};
 
-var handlers = {};
+errorGen.parseError = function(error) {
+  return '(parse-error "' + error.replace(/\\/g, '\\\\') + '")';
+};
 
-// An error output function for MathJax errors.
-
-var errorOutput = function(errors, socket) {
+errorGen.mathjaxErrors = function(errors, socket) {
   socket.write(
     errors
-      .map(function(x) {return '(error "' + x.replace(/\\/g, '\\\\') + '")';})
+      .map(errorGen.parseError)
       .join(' ')
   );
 };
+
+// table of request handlers:
+
+var handlers = {};
 
 // Add the various handlers:
 
 // Accept a LaTeX math expression:
 handlers.enter = function(expr, socket) {
   mjx.config({
-    displayErrors: false,
+    displayErrors: false
   });
   mjx.typeset({math: expr,
                format: 'TeX',
                mml: true},
               function(data) {
                 (data.errors && data.errors.length) ?
-                  errorOutput(data.errors, socket) :
+                  errorGen.mathjaxErrors(data.errors, socket) :
                   socket.write(sre.walk(data.mml)); }
              );
 };
@@ -78,8 +83,9 @@ handlers.up = function() {return sre.move('UP');};
 handlers.down = function() {return sre.move('DOWN');};
 handlers.left = function() {return sre.move('LEFT');};
 handlers.right = function() {return sre.move('RIGHT');};
-handlers.repeat = function() {return sre.move('REPEAT');};
-handlers.root = function() {return sre.move('ROOT');};
+handlers.repeat = function() {return sre.move('TAB');};
+handlers.depth = function() {return sre.move('SPACE');};
+handlers.root = function() {return sre.move('HOME');};
 
 // Start a TCP Server on port 5000
 net.createServer(function(socket) {
