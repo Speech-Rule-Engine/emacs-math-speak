@@ -57,7 +57,7 @@
 (declaim  (optimize  (safety 0) (speed 3)))
 (require 'comint)
 (require 'derived)
-;(require 'hydra)
+                                        ;(require 'hydra)
 ;;}}}
 ;;{{{ Customizations And Variables:
 
@@ -79,7 +79,7 @@ Default value uses the version of `node' set configured via NVM."
   client-buffer ; network socket stream
   client-process ; network connection
   output ; where output is displayed
-  pause ; pending pause to add 
+  pause ; pending pause to add
   results
   )
 
@@ -108,6 +108,18 @@ Throw error if no handler defined."
 
 ;;; All handlers are called with the body of the unit being parsed.
 ;;; Handlers process input and render to output buffer
+;;; Except for the pause handler that merely records the pause,
+;;; Leaving it to the next text handler to consume that pause.
+
+;;; Helper: Handle plain strings
+
+(defun emacspeak-maths-handle-string (string)
+  "Handle plain, unannotated string."
+  (declare (special emacspeak-maths))
+  (with-current-buffer (emacspeak-maths-output emacspeak-maths)
+    (let ((start (point)))
+      (insert (format "%s\n" string))
+      (emacspeak-maths-apply-pause start))))
 
 (defun emacspeak-maths-parse (sexp)
   "Top-level parser dispatch.
@@ -115,13 +127,12 @@ If sexp is a string, return it.
 Otherwise, Examine head of sexp, and applies associated handler to the tail."
   (cond
    ((stringp sexp)
-    (with-current-buffer (emacspeak-maths-output emacspeak-maths)
-      (insert (format "%s\n" sexp))))
+    (emacspeak-maths-handle-string sexp))
    (t
     (cl-assert  (listp sexp) t "%s is not a list." contents)
     (let ((handler (emacspeak-maths-handler-get(car sexp))))
-    (cl-assert (fboundp handler) t "%s is not  a function.")
-    (funcall handler (cdr sexp))))))
+      (cl-assert (fboundp handler) t "%s is not  a function.")
+      (funcall handler (cdr sexp))))))
 
 (defun emacspeak-maths-handle-exp (contents)
   "Handle top-level exp returned from Maths Server."
@@ -136,6 +147,21 @@ Otherwise, Examine head of sexp, and applies associated handler to the tail."
       :pitch-range .pitch-range
       :stress .stress
       :richness .richness))))
+
+;;;Helper: Apply pause and consume:
+
+(defun emacspeak-maths-apply-pause (start)
+  "Apply pause."
+  (declare (special emacspeak-maths))
+  (let ((pause (emacspeak-maths-pause emacspeak-maths)))
+    (when pause
+      (save-excursion
+        (goto-char start)
+        (skip-syntax-forward " ")
+        (put-text-property
+         (point) (1+ (point))
+         'pause pause))
+      (setf (emacspeak-maths-pause emacspeak-maths) nil))))
 
 (defun emacspeak-maths-handle-text (contents)
   "Handle body of annotated text from Maths Server.
@@ -152,11 +178,7 @@ Expected: ((acss) string)."
       (put-text-property
        start (point)
        'personality (emacspeak-maths-acss acss))
-      (when pause
-        (put-text-property
-         start (1+ start)
-         'pause pause)
-        (setf (emacspeak-maths-pause emacspeak-maths) nil)))))
+      (emacspeak-maths-apply-pause start))))
 
 (defun emacspeak-maths-handle-pause (ms)
   "Handle Pause value."
@@ -165,11 +187,10 @@ Expected: ((acss) string)."
   (cond
    ((null (emacspeak-maths-pause emacspeak-maths))
     (setf (emacspeak-maths-pause emacspeak-maths) ms))
-    ((numberp (emacspeak-maths-pause emacspeak-maths))
-     (cl-incf (emacspeak-maths-pause emacspeak-maths) ms))
-    (t (error "Invalid pause %s set earlier."
-              (emacspeak-maths-pause emacspeak-maths)))))
-
+   ((numberp (emacspeak-maths-pause emacspeak-maths))
+    (cl-incf (emacspeak-maths-pause emacspeak-maths) ms))
+   (t (error "Invalid pause %s set earlier."
+             (emacspeak-maths-pause emacspeak-maths)))))
 
 (defun emacspeak-maths-handle-error (contents)
   "Display error message."
@@ -191,7 +212,7 @@ Expected: ((acss) string)."
   "Parse and return one complete chunk of output. Throws an error on an
 incomplete parse, that is expected to be caught by the caller."
    ;;; return first sexp and move point
-   (emacspeak-maths-parse (read (current-buffer))))
+  (emacspeak-maths-parse (read (current-buffer))))
 
 (defun emacspeak-maths-process-filter (proc string)
   "Handle process output from Node math-server.
