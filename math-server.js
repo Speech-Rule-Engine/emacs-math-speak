@@ -95,12 +95,7 @@ net.createServer(function(socket) {
     var args = request.slice(cmd.length + 1);
     var handler = handlers[cmd];
     if (handler !== undefined) {
-      var result = handler.call(null, args, socket);
-      if (result !== undefined) {
-        sender.write(result);
-      } else {
-        process.stdout.write('Handler ' + cmd + ' returned undefined. \n');
-      }
+      handler.call(null, args, socket);
     } else {
       process.stdout.write('Handler for ' + request[0] + ' not defined.\n');
     }
