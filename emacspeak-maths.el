@@ -196,11 +196,19 @@ Expected: ((acss) string)."
   "Display error message."
   (message "%s" contents))
 
+(defun emacspeak-maths-handle-welcome (contents)
+  "Handle welcome message."
+  (message "%s" contents))
+
+
+
+
+
 ;;}}}
 ;;{{{ Map Handlers:
 (cl-loop
  for f in
- '(exp pause text error)
+ '(exp pause text error welcome)
  do
  (emacspeak-maths-handler-set f
                               (intern (format "emacspeak-maths-handle-%s"  (symbol-name f)))))
