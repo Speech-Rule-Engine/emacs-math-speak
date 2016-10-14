@@ -1,0 +1,26 @@
+List of known issues
+
+* Walker 
+
+** Walker gets stuck when going to the right on 
+  a+\frac{b}{c} +d
+
+
+* Prosody and Rules
+
+** Over vs Divided by
+  Use over for simple expressions, divided by otherwise.
+
+** Pausing around over/divided by
+
+* Pausing
+
+** Add weighted pausing
+
+* SRE and MathJax
+
+** Levels not yet reset for root move.
+
+** Depth announcement not returned as an exp.
+
+** Prefixes should be included into the returned exp.
