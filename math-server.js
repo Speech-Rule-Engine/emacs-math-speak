@@ -50,7 +50,9 @@ var handlers = {};
 
 var errorOutput = function(errors, socket) {
   socket.write(
-    errors.map(function(x) {return '(error "' + x + '")';}).join(' ')
+    errors
+      .map(function(x) {return '(error "' + x.replace(/\\/g, '\\\\') + '")';})
+      .join(' ')
   );
 };
 
