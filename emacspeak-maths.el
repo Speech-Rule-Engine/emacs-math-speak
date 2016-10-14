@@ -57,7 +57,10 @@
 (declaim  (optimize  (safety 0) (speed 3)))
 (require 'comint)
 (require 'derived)
-                                        ;(require 'hydra)
+(require 'hydra)
+(require 'emacspeak-preamble)
+(require 'emacspeak-muggles)
+
 ;;}}}
 ;;{{{ Customizations And Variables:
 
@@ -276,7 +279,7 @@ All complete chunks of output are consumed. Partial output is left for next run.
   (let ((server
          (make-comint "Server-Maths" emacspeak-maths-inferior-program nil emacspeak-maths-server-program))
         (client nil))
-    ;(accept-process-output (get-buffer-process server))
+    (accept-process-output (get-buffer-process server) 1.0)
     (setq client (open-network-stream "Client-Math" "*Client-Math*" "localhost" 5000))
     (setf emacspeak-maths
           (make-emacspeak-maths
@@ -340,16 +343,15 @@ All complete chunks of output are consumed. Partial output is left for next run.
   "Special mode for interacting with Spoken Math.
 
 This mode is used by the special buffer that displays spoken math
-returned from the Node server. 
+returned from the Node server.
 This mode is similar to Emacs' `view-mode'.
-see the key-binding list at the end of this description. 
+see the key-binding list at the end of this description.
 Emacs online help facility to look up help on these commands.
 
 \\{emacspeak-maths-spoken-mode-map}"
   (goto-char (point-min))
   (setq header-line-format "Spoken Math")
   (modify-syntax-entry 10 ">"))
-
 
 (defun emacspeak-maths-setup-output ()
   "Set up output buffer for displaying spoken math."
@@ -358,6 +360,21 @@ Emacs online help facility to look up help on these commands.
       (erase-buffer))
     (emacspeak-maths-spoken-mode)
     (current-buffer)))
+
+;;}}}
+;;{{{ Muggle: Speak And Browse Math
+(global-set-key
+ (kbd "s-SPC")
+ (defhydra emacspeak-maths-navigator
+   (:body-pre (emacspeak-muggles-body-pre "Spoken Math")
+              :pre emacspeak-muggles-pre
+              :post emacspeak-muggles-post)
+   "Spoken Math"
+   ("SPC" emacspeak-maths-enter "enter")
+   ("<up>" emacspeak-maths-up "Up")
+   ("<down>" emacspeak-maths-down"down")
+   ("<left>" emacspeak-maths-left "left")
+   ("<right>" emacspeak-maths-right "right")))
 
 ;;}}}
 (provide 'emacspeak-maths)
