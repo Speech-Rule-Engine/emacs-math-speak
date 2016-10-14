@@ -358,7 +358,8 @@ Emacs online help facility to look up help on these commands.
 (defun emacspeak-maths-setup-output ()
   "Set up output buffer for displaying spoken math."
   (with-current-buffer (get-buffer-create "*Spoken Math*")
-    (erase-buffer)
+    (let ((inhibit-read-only t))
+      (erase-buffer))
     (emacspeak-maths-spoken-mode)
     (current-buffer)))
 
