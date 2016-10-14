@@ -57,7 +57,7 @@
 (declaim  (optimize  (safety 0) (speed 3)))
 (require 'comint)
 (require 'derived)
-
+;(require 'hydra)
 ;;}}}
 ;;{{{ Customizations And Variables:
 
@@ -79,6 +79,7 @@ Default value uses the version of `node' set configured via NVM."
   client-buffer ; network socket stream
   client-process ; network connection
   output ; where output is displayed
+  pause ; pending pause to add 
   results
   )
 
@@ -122,8 +123,8 @@ Otherwise, Examine head of sexp, and applies associated handler to the tail."
     (cl-assert (fboundp handler) t "%s is not  a function.")
     (funcall handler (cdr sexp))))))
 
-(defun emacspeak-maths-parse-exp (contents)
-  "Parse top-level exp returned from Maths Server."
+(defun emacspeak-maths-handle-exp (contents)
+  "Handle top-level exp returned from Maths Server."
   (mapc #'emacspeak-maths-parse contents))
 
 (defun emacspeak-maths-acss (acss-alist)
@@ -136,33 +137,41 @@ Otherwise, Examine head of sexp, and applies associated handler to the tail."
       :stress .stress
       :richness .richness))))
 
-(defun emacspeak-maths-parse-text (contents)
-  "Parse body of annotated text from Maths Server.
+(defun emacspeak-maths-handle-text (contents)
+  "Handle body of annotated text from Maths Server.
 Expected: ((acss) string)."
   (declare (special emacspeak-maths))
   (cl-assert (listp contents) t "%s is not a list. " contents)
   (let ((acss (cl-first contents))
         (string (cl-second contents))
+        (pause (emacspeak-maths-pause emacspeak-maths))
         (start nil))
     (with-current-buffer  (emacspeak-maths-output emacspeak-maths)
       (setq start (goto-char (point-max)))
-      (insert string)
+      (insert (format "%s\n" string))
       (put-text-property
        start (point)
-       'personality (emacspeak-maths-acss acss)))))
+       'personality (emacspeak-maths-acss acss))
+      (when pause
+        (put-text-property
+         start (1+ start)
+         'pause pause)
+        (setf (emacspeak-maths-pause emacspeak-maths) nil)))))
 
-(defun emacspeak-maths-parse-pause (contents)
-  "Parse Pause value."
+(defun emacspeak-maths-handle-pause (ms)
+  "Handle Pause value."
   (declare (special emacspeak-maths))
-  (cl-assert (numberp contents) t "%s is not a number. " contents)
-  (with-current-buffer  (emacspeak-maths-output emacspeak-maths)
-    (goto-char (point-max))
-    (insert "\n ")
-    (put-text-property (1- (point)) (point) 'pause contents) ;;; make it rear-sticky
-    ))
+  (cl-assert (numberp ms) t "%s is not a number. " ms)
+  (cond
+   ((null (emacspeak-maths-pause emacspeak-maths))
+    (setf (emacspeak-maths-pause emacspeak-maths) ms))
+    ((numberp (emacspeak-maths-pause emacspeak-maths))
+     (cl-incf (emacspeak-maths-pause emacspeak-maths) ms))
+    (t (error "Invalid pause %s set earlier."
+              (emacspeak-maths-pause emacspeak-maths)))))
 
 
-(defun emacspeak-maths-parse-error (contents)
+(defun emacspeak-maths-handle-error (contents)
   "Display error message."
   (message "%s" contents))
 
@@ -173,7 +182,7 @@ Expected: ((acss) string)."
  '(exp pause text error)
  do
  (emacspeak-maths-handler-set f
-                              (intern (format "emacspeak-maths-parse-%s"  (symbol-name f)))))
+                              (intern (format "emacspeak-maths-handle-%s"  (symbol-name f)))))
 
 ;;}}}
 ;;{{{ Process Filter:
