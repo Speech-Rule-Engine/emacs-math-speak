@@ -107,7 +107,7 @@ net.createServer(function(socket) {
   }
 
   // Announce yourself:
-  socket.write('(Welcome ' + socket.name + ')\n');
+  socket.write('(welcome ' + socket.name + ')\n');
   // Handle incoming messages from Emacs:
   socket.on('data', function(data) {
     respond(data, socket);
