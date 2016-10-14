@@ -211,10 +211,6 @@ Expected: ((acss) string)."
   "Handle welcome message."
   (message "%s" contents))
 
-
-
-
-
 ;;}}}
 ;;{{{ Map Handlers:
 (cl-loop
@@ -280,7 +276,7 @@ All complete chunks of output are consumed. Partial output is left for next run.
   (let ((server
          (make-comint "Server-Maths" emacspeak-maths-inferior-program nil emacspeak-maths-server-program))
         (client nil))
-    (accept-process-output (get-buffer-process server))
+    ;(accept-process-output (get-buffer-process server))
     (setq client (open-network-stream "Client-Math" "*Client-Math*" "localhost" 5000))
     (setf emacspeak-maths
           (make-emacspeak-maths
@@ -339,7 +335,7 @@ All complete chunks of output are consumed. Partial output is left for next run.
 ;;}}}
 ;;{{{ Output: spoken-math mode:
 
-(define-derived-mode emacspeak-maths-spoken-mode view-mode
+(define-derived-mode emacspeak-maths-spoken-mode special-mode
   "Spoken Math On The Complete Audio Desktop"
   "Special mode for interacting with Spoken Math.
 
