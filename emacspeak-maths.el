@@ -91,6 +91,7 @@
 
 (defcustom emacspeak-maths-inferior-program
   (or (executable-find "node")
+      ;; TODO: This is very fragile. Rewrite with nvm current.
       (expand-file-name "~/.nvm/versions/node/v6.4.0/bin/node"))
   "Location of `node' executable.
 Default value uses the version of `node' set configured via NVM."
@@ -295,6 +296,10 @@ All complete chunks of output are consumed. Partial output is left for next run.
 (defun emacspeak-maths-start ()
   "Start Node math-server, and connect to it."
   (interactive)
+  (emacspeak-maths-bridge-start)
+  (message "Started Maths server and client."))
+
+(defun emacspeak-maths-bridge-start ()
   (declare (special emacspeak-maths-inferior-program
                     emacspeak-maths emacspeak-maths-server-program))
   (let ((server
@@ -309,12 +314,15 @@ All complete chunks of output are consumed. Partial output is left for next run.
            :server-process (get-buffer-process server)
            :client-process client
            :client-buffer (process-buffer client)))
-    (set-process-filter client #'emacspeak-maths-process-filter)
-    (message "Started Maths server and client.")))
+    (set-process-filter client #'emacspeak-maths-process-filter)))
 
-(defun emacspeak-maths-shutdown()
+(defun emacspeak-maths-shutdown ()
   "Shutdown math-server and client."
   (interactive)
+  (emacspeak-maths-bridge-shutdown)
+  (message "Shutdown Maths server and client."))
+
+(defun emacspeak-maths-bridge-shutdown ()
   (declare (special emacspeak-maths))
   (when (process-live-p (emacspeak-maths-client-process emacspeak-maths))
     (delete-process (emacspeak-maths-client-process emacspeak-maths)))
@@ -323,8 +331,15 @@ All complete chunks of output are consumed. Partial output is left for next run.
   (when (buffer-live-p (emacspeak-maths-server-buffer emacspeak-maths))
     (kill-buffer (emacspeak-maths-server-buffer emacspeak-maths)))
   (when (buffer-live-p (emacspeak-maths-client-buffer emacspeak-maths))
-    (kill-buffer (emacspeak-maths-client-buffer emacspeak-maths)))
-  (message "Shutdown Maths server and client."))
+    (kill-buffer (emacspeak-maths-client-buffer emacspeak-maths))))
+
+(defun emacspeak-maths-restart ()
+  "Restart Node math-server if running. Otherwise starts a new one."
+  (interactive)
+  (emacspeak-maths-bridge-shutdown)
+  (emacspeak-maths-bridge-start)
+  (message "Restarting Maths server and client."))
+
 
 ;;}}}
 ;;{{{ Navigators:
@@ -339,7 +354,7 @@ All complete chunks of output are consumed. Partial output is left for next run.
 
 (cl-loop
  for move in
- '("left" "right" "up" "down" "root")
+ '("left" "right" "up" "down" "root" "depth")
  do
  (eval
   `(defun ,(intern (format "emacspeak-maths-%s" move)) ()
