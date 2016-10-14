@@ -136,7 +136,18 @@ Otherwise, Examine head of sexp, and applies associated handler to the tail."
 
 (defun emacspeak-maths-handle-exp (contents)
   "Handle top-level exp returned from Maths Server."
-  (mapc #'emacspeak-maths-parse contents))
+  (declare (special emacspeak-maths))
+  (with-current-buffer (emacspeak-maths-output emacspeak-maths)
+    (goto-char (point-max))
+    (let ((inhibit-read-only  t)
+          (start (point))
+          (end nil))
+      (mapc #'emacspeak-maths-parse contents)
+      (setq end (point))
+      (insert "\f")
+      (goto-char start)
+      (display-buffer (emacspeak-maths-output emacspeak-maths))
+      (emacspeak-speak-region start end))))
 
 (defun emacspeak-maths-acss (acss-alist)
   "Return ACSS voice corresponding to acss-alist."
@@ -273,7 +284,7 @@ All complete chunks of output are consumed. Partial output is left for next run.
     (setq client (open-network-stream "Client-Math" "*Client-Math*" "localhost" 5000))
     (setf emacspeak-maths
           (make-emacspeak-maths
-           :output (get-buffer-create "*Spoken Math*")
+           :output (emacspeak-maths-setup-output)
            :server-buffer  server
            :server-process (get-buffer-process server)
            :client-process client
@@ -324,6 +335,32 @@ All complete chunks of output are consumed. Partial output is left for next run.
 
 ;;}}}
 ;;{{{ Displaying Output:
+
+;;}}}
+;;{{{ Output: spoken-math mode:
+
+(define-derived-mode emacspeak-maths-spoken-mode view-mode
+  "Spoken Math On The Complete Audio Desktop"
+  "Special mode for interacting with Spoken Math.
+
+This mode is used by the special buffer that displays spoken math
+returned from the Node server. 
+This mode is similar to Emacs' `view-mode'.
+see the key-binding list at the end of this description. 
+Emacs online help facility to look up help on these commands.
+
+\\{emacspeak-maths-spoken-mode-map}"
+  (goto-char (point-min))
+  (setq header-line-format "Spoken Math")
+  (modify-syntax-entry 10 ">"))
+
+
+(defun emacspeak-maths-setup-output ()
+  "Set up output buffer for displaying spoken math."
+  (with-current-buffer (get-buffer-create "*Spoken Math*")
+    (erase-buffer)
+    (emacspeak-maths-spoken-mode)
+    (current-buffer)))
 
 ;;}}}
 (provide 'emacspeak-maths)
