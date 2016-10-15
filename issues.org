@@ -1,3 +1,11 @@
+** Start A New Ruleset 
+
+  - Clone  the ruleset we are using at present and call it "emacspeak" --
+  then start tweaking it.
+  - Implement handler for style that takes a ruleset name and switches
+  styles.
+
+
 List of known issues
 
 * Walker 
