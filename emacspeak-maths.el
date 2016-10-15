@@ -105,7 +105,7 @@ Default value uses the version of `node' set configured via NVM."
   client-process ; network connection
   output ; where output is displayed
   pause ; pending pause to add
-  results
+  result
   )
 
 (defvar emacspeak-maths nil
@@ -278,7 +278,7 @@ All complete chunks of output are consumed. Partial output is left for next run.
 ;;; Parse one complete chunk
                 (setq result (emacspeak-maths-read-output))
 ;;; Todo: reverse later depending on how we use it.
-                (setf (emacspeak-maths-results emacspeak-maths) result)
+                (setf (emacspeak-maths-result emacspeak-maths) result)
                 (skip-syntax-forward " >")
                 (delete-region start (point))
                 (setq start (point)))
