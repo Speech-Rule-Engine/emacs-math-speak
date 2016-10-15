@@ -307,7 +307,7 @@ All complete chunks of output are consumed. Partial output is left for next run.
   (let ((server
          (make-comint "Server-Maths" emacspeak-maths-inferior-program nil emacspeak-maths-server-program))
         (client nil))
-    (accept-process-output (get-buffer-process server) 1.0)
+    (accept-process-output (get-buffer-process server) 1.0 nil 'just-this-one)
     (setq client (open-network-stream "Client-Math" "*Client-Math*" "localhost" 5000))
     (setf emacspeak-maths
           (make-emacspeak-maths
