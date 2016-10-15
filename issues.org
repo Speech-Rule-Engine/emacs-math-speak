@@ -7,6 +7,11 @@ List of known issues
 
 
 * Prosody and Rules
+**Pick Suitable Orthogonal Dimensions 
+
+Pick orthogonal dimensions for superscripting/subscripting and
+nesting.
+Define these in terms of ACSS, then use consistently.
 
 ** Over vs Divided by
   Use over for simple expressions, divided by otherwise.
@@ -24,3 +29,17 @@ List of known issues
 ** Depth announcement not returned as an exp.
 
 ** Prefixes should be included into the returned exp.
+
+
+#+OPTIONS: ':nil *:t -:t ::t <:t H:3 \n:nil ^:t arch:headline
+#+OPTIONS: author:t c:nil creator:nil d:(not "LOGBOOK") date:t e:t
+#+OPTIONS: email:nil f:t inline:t num:t p:nil pri:nil prop:nil stat:t
+#+OPTIONS: tags:t tasks:t tex:t timestamp:t title:t toc:t todo:t |:t
+#+TITLE: Speech Rule Engine Issues 
+#+DATE: <2016-10-14 Fri>
+#+AUTHOR: raman
+#+EMAIL: raman@google.com
+#+LANGUAGE: en
+#+SELECT_TAGS: export
+#+EXCLUDE_TAGS: noexport
+#+CREATOR: Emacs 25.1.1 (Org mode 8.3.6)
