@@ -78,7 +78,7 @@
 (declaim  (optimize  (safety 0) (speed 3)))
 (require 'comint)
 (require 'derived)
-(require 'hydra)
+(require 'hydra "hydra" 'no-error)
 (require 'emacspeak-preamble)
 (require 'emacspeak-muggles)
 
