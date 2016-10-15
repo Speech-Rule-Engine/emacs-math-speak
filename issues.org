@@ -10,6 +10,13 @@ List of known issues
 
 * Walker 
 
+** Walker breaks 
+
+: (x+1)(x-1)
+
+
+Moving down then up breaks walker.
+
 ** Walker gets stuck when going to the right on 
   a+\frac{b}{c} +d
 
