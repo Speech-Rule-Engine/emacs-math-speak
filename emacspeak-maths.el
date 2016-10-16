@@ -423,8 +423,8 @@ For use on Wikipedia pages  for example."
 
 ;;}}}
 ;;{{{ Muggle: Speak And Browse Math
-
-(global-set-key
+(when (featurep 'hydra)
+  (global-set-key
  (kbd "s-SPC")
  (defhydra emacspeak-maths-navigator
    (:body-pre (emacspeak-muggles-body-pre "Spoken Math")
@@ -437,7 +437,7 @@ For use on Wikipedia pages  for example."
    ("<up>" emacspeak-maths-up "Up")
    ("<down>" emacspeak-maths-down"down")
    ("<left>" emacspeak-maths-left "left")
-   ("<right>" emacspeak-maths-right "right")))
+   ("<right>" emacspeak-maths-right "right"))))
 
 ;;}}}
 (provide 'emacspeak-maths)
