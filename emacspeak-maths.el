@@ -95,7 +95,7 @@
       (expand-file-name "~/.nvm/versions/node/v6.4.0/bin/node"))
   "Location of `node' executable.
 Default value uses the version of `node' set configured via NVM."
-  :type 'string
+  :type 'file
   :group 'emacspeak-maths)
 
 (cl-defstruct emacspeak-maths
