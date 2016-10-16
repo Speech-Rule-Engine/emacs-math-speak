@@ -90,11 +90,8 @@
   :group 'emacspeak)
 
 (defcustom emacspeak-maths-inferior-program
-  (or (executable-find "node")
-      ;; TODO: This is very fragile. Rewrite with nvm current.
-      (expand-file-name "~/.nvm/versions/node/v6.4.0/bin/node"))
-  "Location of `node' executable.
-Default value uses the version of `node' set configured via NVM."
+  (executable-find "node")
+  "Location of `node' executable."
   :type 'file
   :group 'emacspeak-maths)
 
