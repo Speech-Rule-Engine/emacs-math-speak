@@ -360,7 +360,11 @@ All complete chunks of output are consumed. Partial output is left for next run.
 
 (defun emacspeak-maths-enter (latex)
   "Send a LaTeX expression to Maths server."
-  (interactive "sLaTeX: ")
+  (interactive
+   (list
+    (read-from-minibuffer "LaTeX: "
+                          nil nil nil
+                          (emacspeak-maths-guess-input))))
   (declare (special emacspeak-maths))
   (emacspeak-maths-ensure-server)
   (process-send-string
@@ -414,6 +418,14 @@ Emacs online help facility to look up help on these commands.
 
 ;;}}}
 ;;{{{ Helpers:
+
+(defun emacspeak-maths-guess-input ()
+  "Examine current mode, text around point etc. to guess Math content to read."
+  (cond
+   ((and (eq major-mode 'eww-mode)
+         (not (string-equal (get-text-property (point) 'shr-alt) "No image under point")))
+    (get-text-property (point) 'shr-alt))
+   (mark-active (buffer-substring (point) (mark)))))
 
 (defun emacspeak-maths-speak-alt ()
   "Speak alt text as Maths.
