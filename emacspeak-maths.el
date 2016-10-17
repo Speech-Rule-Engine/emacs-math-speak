@@ -362,11 +362,19 @@ All complete chunks of output are consumed. Partial output is left for next run.
   "Examine current mode, text around point etc. to guess Math content to read."
   (declare (special emacspeak-maths))
   (setf(emacspeak-maths-input emacspeak-maths)
-        (cond
-   ((and (eq major-mode 'eww-mode)
-         (not (string-equal (get-text-property (point) 'shr-alt) "No image under point")))
-    (get-text-property (point) 'shr-alt))
-   (mark-active (buffer-substring (point) (mark))))))
+       (cond
+        ((or (eq major-mode 'tex-mode)
+             (eq major-mode 'latex-mode))
+         ;;; Placeholder --- need a better test.
+         (let ((start (dtk-previous-style-change (point)))
+               (end (dtk-next-style-change (point))))
+           (buffer-substring
+            (or start (point-min))
+            (or end (point-max)))))
+        ((and (eq major-mode 'eww-mode)
+              (not (string-equal (get-text-property (point) 'shr-alt) "No image under point")))
+         (get-text-property (point) 'shr-alt))
+        (mark-active (buffer-substring (point) (mark))))))
 
 
 (defun emacspeak-maths-enter (latex)
