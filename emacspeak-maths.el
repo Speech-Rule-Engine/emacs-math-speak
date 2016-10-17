@@ -103,6 +103,7 @@
   server-process ; node process handle
   client-buffer ; network socket stream
   client-process ; network connection
+  input  ; LaTeX we send 
   output ; where output is displayed
   pause ; pending pause to add
   result
@@ -357,16 +358,29 @@ All complete chunks of output are consumed. Partial output is left for next run.
 
 ;;}}}
 ;;{{{ Navigators:
+(defun emacspeak-maths-guess-input ()
+  "Examine current mode, text around point etc. to guess Math content to read."
+  (declare (special emacspeak-maths))
+  (setf(emacspeak-maths-input emacspeak-maths)
+        (cond
+   ((and (eq major-mode 'eww-mode)
+         (not (string-equal (get-text-property (point) 'shr-alt) "No image under point")))
+    (get-text-property (point) 'shr-alt))
+   (mark-active (buffer-substring (point) (mark))))))
+
 
 (defun emacspeak-maths-enter (latex)
-  "Send a LaTeX expression to Maths server."
+  "Send a LaTeX expression to Maths server.
+Tries to guess default based on context."
   (interactive
    (list
+    (progn (emacspeak-maths-guess-input) ;guess based on context
     (read-from-minibuffer "LaTeX: "
-                          nil nil nil
-                          (emacspeak-maths-guess-input))))
+                          nil nil nil nil
+                          (emacspeak-maths-input emacspeak-maths)))))
   (declare (special emacspeak-maths))
   (emacspeak-maths-ensure-server)
+  (setf (emacspeak-maths-input emacspeak-maths) latex)
   (process-send-string
    (emacspeak-maths-client-process emacspeak-maths)
    (format "enter: %s"latex)))
@@ -418,14 +432,6 @@ Emacs online help facility to look up help on these commands.
 
 ;;}}}
 ;;{{{ Helpers:
-
-(defun emacspeak-maths-guess-input ()
-  "Examine current mode, text around point etc. to guess Math content to read."
-  (cond
-   ((and (eq major-mode 'eww-mode)
-         (not (string-equal (get-text-property (point) 'shr-alt) "No image under point")))
-    (get-text-property (point) 'shr-alt))
-   (mark-active (buffer-substring (point) (mark)))))
 
 (defun emacspeak-maths-speak-alt ()
   "Speak alt text as Maths.
