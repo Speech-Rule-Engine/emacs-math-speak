@@ -359,14 +359,6 @@ left for next run."
   (declare (special emacspeak-maths))
   (setf(emacspeak-maths-input emacspeak-maths)
        (cond
-        ((or (eq major-mode 'tex-mode)
-             (eq major-mode 'latex-mode))
-         ;;; Placeholder --- need a better test.
-         (let ((start (dtk-previous-style-change (point)))
-               (end (dtk-next-style-change (point))))
-           (buffer-substring
-            (or start (point-min))
-            (or end (point-max)))))
         ((and (eq major-mode 'eww-mode)
               (not
                (string-equal
