@@ -344,8 +344,8 @@ All complete chunks of output are consumed. Partial output is left for next run.
 
 (defun emacspeak-maths-ensure-server ()
   "Start up Maths Server bridge if not already running."
-  (declare (special emacspeak-maths))
-  (unless (process-live-p (emacspeak-maths-server-process emacspeak-maths))
+  (declare (special emacspeak-maths))s
+  (unless (and emacspeak-maths (process-live-p (emacspeak-maths-server-process emacspeak-maths)))
     (emacspeak-maths-bridge-start)))
 
 (defun emacspeak-maths-restart ()
