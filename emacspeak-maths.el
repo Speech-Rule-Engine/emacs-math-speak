@@ -407,8 +407,7 @@ left for next run."
   (declare (special emacspeak-maths))
   (setf(emacspeak-maths-input emacspeak-maths)
        (cond
-        ((and (or (eq major-mode 'tex-mode)
-                  (eq major-mode 'latex-mode))
+        ((and (memq major-mode '(tex-mode plain-tex-mode latex-mode ams-tex-mode))
               (featurep 'texmathp))
          (emacspeak-maths-guess-tex))
         ((and (eq major-mode 'eww-mode)
