@@ -9,18 +9,8 @@
 List of known issues
 
 * Walker 
-
-** Walker breaks 
-
-: (x+1)(x-1)
-
-
-Moving down then up breaks walker.
-
-** Walker gets stuck when going to the right on 
-  a+\frac{b}{c} +d
-
-
+** Unicode Issues
+  1. 7/4 spoken as 7 solidus 4
 * Prosody and Rules
 **Pick Suitable Orthogonal Dimensions 
 
