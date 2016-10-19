@@ -357,6 +357,14 @@ left for next run."
 
 ;;}}}
 ;;{{{ Navigators:
+;;; Guess expression from Calc:
+(defun emacspeak-maths-guess-calc ()
+  "Guess expression to speak in calc buffers.
+Set calc-language to tex to use this feature."
+  (declare (special calc-last-kill))
+  (cl-assert (eq major-mode 'calc-mode) nil "This is not a Calc buffer.")
+  (calc-kill 1 'no-delete)
+  (substring (car calc-last-kill) 2))
 
 ;;; Helper: Guess current math expression from TeX/LaTeX
 
@@ -410,6 +418,8 @@ left for next run."
   (declare (special emacspeak-maths))
   (setf(emacspeak-maths-input emacspeak-maths)
        (cond
+        ((eq major-mode 'calc-mode)
+         (emacspeak-maths-guess-calc))
         ((and (memq major-mode '(tex-mode plain-tex-mode latex-mode ams-tex-mode))
               (featurep 'texmathp))
          (emacspeak-maths-guess-tex))
@@ -424,7 +434,8 @@ left for next run."
 
 (defun emacspeak-maths-enter (latex)
   "Send a LaTeX expression to Maths server.
-Tries to guess default based on context."
+Tries to guess default based on context.
+Uses guessed default if user enters an empty string."
   (interactive
    (list
     (progn (emacspeak-maths-guess-input) ;guess based on context
@@ -433,6 +444,8 @@ Tries to guess default based on context."
                                  (emacspeak-maths-input emacspeak-maths)))))
   (declare (special emacspeak-maths))
   (emacspeak-maths-ensure-server)
+  (when (string= "" latex)
+    (setq latex (emacspeak-maths-input emacspeak-maths)))
   (setf (emacspeak-maths-input emacspeak-maths) latex)
   (process-send-string
    (emacspeak-maths-client-process emacspeak-maths)
