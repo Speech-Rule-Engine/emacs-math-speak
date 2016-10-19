@@ -481,13 +481,15 @@ Uses guessed default if user enters an empty string."
  do
  (eval
   `(defun ,(intern (format "emacspeak-maths-%s" move)) ()
-     ,(format "Move %s in current Math expression." move)
+     ,(format "Move %s in current Math expression and speak the result." move)
      (interactive)
      (declare (special emacspeak-maths))
      (process-send-string
       (emacspeak-maths-client-process emacspeak-maths)
       ,(format "%s:\n" move)))))
 
+;;; Fix auto-generated documentation:
+(put 'emacspeak-maths-depth 'function-documentation "Speak current depth.")
 ;;}}}
 ;;{{{ Speaking Output:
 
