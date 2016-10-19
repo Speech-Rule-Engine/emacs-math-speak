@@ -53,14 +53,23 @@
 ;;; expressions using the emacspeak-maths-navigator described below.
 ;;;
 ;;; Invoke the Navigator using s-spc --- this is the <windows> key on
-;;; Linux. Now you can use these keys: @itemize @item Enter: <SPC>
-;;; Enter a LaTeX expression. @item Alt-Text <a> Process alt-text
-;;; under point as LaTeX. @item Down <down> Move down a level. @item
-;;; Up <up> Move up a level. @item Left <left> Move left. @item Right
-;;; <right> Move right. @item Exit <any other key> Exit
+;;; Linux. Now you can use these keys: 
+;;; @itemize 
+;;; @item Enter: <SPC>
+;;; Enter a LaTeX expression. 
+;;; @item Alt-Text <a> Process alt-text
+;;; under point as LaTeX. 
+;;; @item Down <down> Move down a level. 
+;;; @item
+;;; Up <up> Move up a level. 
+;;; @item Left <left> Move left. 
+;;; @item Right
+;;; <right> Move right. 
+;;; @item Exit <any other key> Exit
 ;;; navigator.
  ;;;
-;;;@end itemize
+;;;
+;;; @end itemize
 ;;;The current expression is spoken after
 ;;; each of the above commands. It is also displayed in a special
 ;;; buffer *Spoken Math*. That buffer holds all previously generated
