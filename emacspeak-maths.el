@@ -432,6 +432,19 @@ Set calc-language to tex to use this feature."
         (mark-active
          (buffer-substring (region-beginning)(region-end))))))
 
+(defun emacspeak-maths-enter-guess ()
+  "Send the guessed  LaTeX expression to Maths server.
+Guess is based on context."
+  (interactive)
+  (emacspeak-maths-guess-input)         ;guess based on context
+  (declare (special emacspeak-maths))
+  (emacspeak-maths-ensure-server)
+  (process-send-string
+   (emacspeak-maths-client-process emacspeak-maths)
+   (format "enter: %s"
+           (emacspeak-maths-input emacspeak-maths))))
+
+
 (defun emacspeak-maths-enter (latex)
   "Send a LaTeX expression to Maths server.
 Tries to guess default based on context.
@@ -518,6 +531,7 @@ For use on Wikipedia pages  for example."
                 :pre emacspeak-muggles-pre
                 :post emacspeak-muggles-post)
      "Spoken Math"
+     ("RET" emacspeak-maths-enter-guess)
      ("SPC" emacspeak-maths-enter "enter")
      ("a" emacspeak-maths-speak-alt "Alt Text")
      ("d" emacspeak-maths-depth "Depth")
