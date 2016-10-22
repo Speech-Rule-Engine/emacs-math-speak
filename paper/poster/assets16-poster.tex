@@ -36,16 +36,17 @@ integration.}}
     \begin{column}{.48\linewidth}
       \begin{block}{\Large Motivation}
         \begin{itemize}
-        \item Mathematics is the single most significant hurdle for inclusive
-          education for visually impaired students in the STEM subjects.
-        \item  In secondary
-          education increasing complexity of mathematical formulas makes it harder to
-          communicate content equally effectively to both sighted and blind students.
+        \item Mathematics is still the single most significant hurdle for
+          inclusive education for visually impaired students in the STEM
+          subjects.
+        \item In secondary education increasing complexity of mathematical
+          formulas makes it harder to communicate content equally effectively to
+          both sighted and blind students.
         \item Dedicated Braille formats become quickly unwieldy for more
-          advanced mathematics
-        \item It becomes impossible for students to communicate them to their
-          peers or professors.
-        \item On Transitioning from high school to University students often
+          advanced mathematics.
+        \item Students need to communicate their work to their sighted peers and
+          professors.
+        \item On transitioning from high school to University students often
           have to learn {\LaTeX} to have a means to read and communicate
           advanced material.
         \end{itemize}
@@ -54,6 +55,8 @@ integration.}}
     \begin{column}{.48\linewidth}
       \begin{block}{\Large Aim of Our Work}\large
         \begin{itemize}
+        \item Provide a Maths mode for Emacspeak using MathJax and Speech Rule
+          Engine.
         \item Focus on supporting students in learning, writing and working with
           {\LaTeX}.
         \item Allow them to take source material, read it, browse it and
@@ -67,7 +70,6 @@ integration.}}
           \item by enabling
             interactive exploration of rendered expressions on the fly, while editing. 
           \end{itemize}
-        \item A Maths mode for Emacspeak using MathJax and Speech Rule Engine (SRE)
         \end{itemize}
       \end{block}
     \end{column}
@@ -78,10 +80,10 @@ integration.}}
       \begin{block}{\Large Emacspeak}
         \begin{itemize}
         \item Turns Emacs into an audio desktop for visually impaired users.
-        \item Supports a large number of activities in Emacs 
-        \item Rich aural presentations via audio formatting and earcons
+        \item Supports a large number of activities in Emacs.
+        \item Rich aural presentations via audio formatting and earcons.
         \item Conveys spatial layout, syntax highlighting etc., via different
-          prosody axes (e.g., change of pitch, richness)
+          prosody axes (e.g., change of pitch, richness).
         \item \textcolor{red}{\url{https://github.com/tvraman/emacspeak}}
         \end{itemize}
       \end{block}
@@ -89,12 +91,12 @@ integration.}}
         \begin{itemize}
         \item Node server provides:
           \begin{itemize}
-          \item MathJax pipe for {\LaTeX} to MathML translation
-          \item Stateful SRE for speech translation and interactive exploration
-          \item SRE performs a semantic analysis of the expression\\
+          \item MathJax pipe for {\LaTeX} to MathML translation.
+          \item Stateful SRE for speech translation and interactive exploration.
+          \item SRE performs a semantic analysis of MathML expressions.\\
             \begin{minipage}{.3\linewidth}
               Example:\\
-              Quadratic formula:\\
+              Quadratic equation\\
               \[ax^2 + bx + c = 0\]
             \end{minipage}
             \begin{minipage}{0.2\linewidth}\tiny
@@ -134,13 +136,13 @@ integration.}}
             \end{minipage}
           \item Returns speech strings annotated with Aural CSS markup.
           \end{itemize}
-        \item Emacspeak client
+        \item Emacspeak client:
           \begin{itemize}
-          \item detects maths delimiters and sends {\LaTeX} expressions to
-            server
-          \item voices returned speech string using two prosody axes to convey
+          \item Detects maths delimiters and sends {\LaTeX} expressions to
+            server.
+          \item Voices returned speech string using two prosody axes to convey
             meaning:
-            Nesting of parenthesis and fractions vs. 2D layout of sub and superscripts
+            Nesting of parenthesis and fractions vs. 2D layout of sub and superscripts.
           \end{itemize}
         \end{itemize}
       \end{block}
@@ -169,8 +171,8 @@ integration.}}
           \includegraphics[width=.5\textwidth]{quadratic-step2-cropped.png}
         \item Better support for learning {\LaTeX} via 
           \begin{itemize}
-          \item speech rendering of MathJax's informative error messages
-          \item voicing of partial expressions and sub-expressions
+          \item speech rendering of MathJax's informative error messages,
+          \item voicing of partial expressions and sub-expressions.
           \end{itemize}
         \item Abstraction of sub-expressions via responsive equations:
           \hspace*{-1cm}
@@ -183,12 +185,12 @@ integration.}}
     \begin{column}{.32\linewidth}
       \begin{block}{\Large Speech Rule Engine}
         \begin{itemize}
-        \item JavaScript library that translates XML expressions into speech
+        \item JavaScript library for translating XML expressions into speech
           strings according to rules specified in extended XPath syntax.
         \item Runs both in browsers and as Node module.
         \item Implements a number of features for Maths:
           \begin{itemize}
-          \item traditional Mathspeak and ChromeVox's prosody-rich speech rules.
+          \item traditional Mathspeak and ChromeVox's prosody-rich speech rules,
           \item semantic interpretation and enrichment of MathML,
           \item intelligent summaries of sub-expressions,
           \item interactive exploration of expressions, highlighting of DOM
@@ -202,23 +204,23 @@ integration.}}
         \item {\LaTeX} editing in AucTeX mode
           \begin{itemize}
           \item Simultaneous visual and aural rendering in AucTeX preview mode.
-          \item Integrates with Emacspeak's aural rendering of syntax highlighting
+          \item Integrates with Emacspeak's aural rendering of syntax highlighting.
           \end{itemize}
         \item Hydra: Package for temporary or repeatable key bindings
           \begin{itemize}
           \item Voicing and interactive exploration of single {\LaTeX}
-            expressions at any time
-          \item On key press Maths input via the minibuffer
+            expressions at any time.
+          \item On key press Maths input via the minibuffer.
           \end{itemize}
         \item EWW: Emacs Web Browser
           \begin{itemize}
-          \item Alt text given as {\LaTeX} or AsciiMath can be voiced and explored
-          \item Examples: Wikipedia, MathWorld
+          \item Alt text given as {\LaTeX} or AsciiMath can be voiced and explored.
+          \item Examples: Wikipedia, MathWorld.
           \end{itemize}
         \item Calc: Emacs Calculator with many symbolic features
           \begin{itemize}
-          \item Symbolic expressions can be inserted and output as {\LaTeX}
-          \item Last expression can be voiced and explored
+          \item Symbolic expressions can be inserted and output as {\LaTeX}.
+          \item Last expression can be voiced and explored.
           \end{itemize}
         \end{itemize}
         System is available at:\\
