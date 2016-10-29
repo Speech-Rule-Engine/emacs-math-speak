@@ -31,6 +31,9 @@ Define these in terms of ACSS, then use consistently.
 
 ** Levels not yet reset for root move.
 
+** Crashes on Binomial Theorem From wikipedia 
+
+(x+y)^{n}=\sum _{k=0}^{n}{\binom {n}{k}}x^{n-k}y^{k}
 ** Depth announcement not returned as an exp.
 
 ** Prefixes should be included into the returned exp.
