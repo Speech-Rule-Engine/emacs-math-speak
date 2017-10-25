@@ -1,0 +1,24 @@
+* Agenda: Oct 25, 2017 Hackathon 
+
+
+** Browsing Loses Aural CSS 
+
+When browsing a math expression, subsequent auditory output appears to
+have no Aural CSS.
+ 
+Repro Steps:
+
+Enter  a math expression, 
+: \frac{a+b}{c+d}
+
+Notice that the auditory output uses ACSS to audio-format
+subexpressions.  Press down-arrow to move down a level, and the
+formatting is lost. 
+
+We should retain the original formatting so that the user gets an
+implicit cue as to where in the tree he is at any given point.
+
+** Tune Aural CSS Settings 
+
+Need to start tuning  Aural CSS parameters  --- I still dont know
+where in the code I make changes.
