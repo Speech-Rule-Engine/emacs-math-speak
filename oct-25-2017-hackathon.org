@@ -22,3 +22,18 @@ implicit cue as to where in the tree he is at any given point.
 
 Need to start tuning  Aural CSS parameters  --- I still dont know
 where in the code I make changes.
+
+** Design Thoughts 
+
+Use abstract dimensions for maths: subscripting/superscripting,
+nesting, stacking.
+
+In a separate JS file, specify a vector of ACSS tupples for each of
+these dimensions:
+: (average-pitch, pitch-range, richness, smoothness)
+
+So the vector of tupples might look like:
+:[(1 1 0 0) (1 3 0 0)...]
+
+Then the rendering code in the SRE can just apply values from this
+vector of tupples during rendering.
