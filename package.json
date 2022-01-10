@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zorkow/emacs-math-speak.git"
+    "url": "git+https://github.com/speech-rule-engine/emacs-math-speak.git"
   },
   "keywords": [
     "Maths",
@@ -18,9 +18,9 @@
   "author": "Volker Sorge <Volker.Sorge@gmail.com> (http://www.cs.bham.ac.uk/~vxs)",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/zorkow/emacs-math-speak/issues"
+    "url": "https://github.com/speech-rule-engine/emacs-math-speak/issues"
   },
-  "homepage": "https://github.com/zorkow/emacs-math-speak#readme",
+  "homepage": "https://github.com/speech-rule-engine/emacs-math-speak#readme",
   "dependencies": {
     "net": ">=1.0.2",
     "mathjax-node": ">=0.5.1",

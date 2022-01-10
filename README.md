@@ -1,5 +1,5 @@
 # emacs-math-speak
-A bridge between [EmacsSpeak](https://github.com/tvraman/emacspeak) and the [Speech Rule Engine](https://github.com/zorkow/speech-rule-engine).
+A bridge between [EmacsSpeak](https://github.com/tvraman/emacspeak) and the [Speech Rule Engine](https://github.com/speech-rule-engine/speech-rule-engine).
 
 
 ## Install
