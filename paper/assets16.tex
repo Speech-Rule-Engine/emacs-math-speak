@@ -1,13 +1,6 @@
-%\documentclass{acm_proc_article-sp}
 \documentclass{sig-alternate-05-2015}
-\usepackage{paralist}
-\usepackage{url}
 \usepackage{amsmath,amssymb}
-\usepackage{listings}
-\usepackage{tikz}
-\usepackage{color}
 \usepackage{xspace}
-\usetikzlibrary{trees}
 
 \CopyrightYear{2016}
 \setcopyright{rightsretained}
@@ -31,60 +24,18 @@
 \newcommand{\latex}{\LaTeX\xspace}
 \newcommand{\sre}{SRE\xspace}
 
-% \DeclareUnicodeCharacter{B1}{\pm}
-%% LANGUAGE      Markup definitions
-\def\lstxml{
-  \lstset{language=XML,
-    basicstyle=\scriptsize,
-    keywordstyle=\bfseries\ttfamily,
-    identifierstyle=\ttfamily, 
-    % commentstyle=\color{Brown},
-    stringstyle=\ttfamily,
-    showstringspaces=false,
-    columns=[l]flexible, %% , basewidth={0.5em,0.4em}
-    escapeinside={(@*}{*@)},
-    deletekeywords={type,id}, % does not work!
-    otherkeywords={encoding,
-      mrow,math,mfrac,mi,msqrt,mo,mn,span,nobr,img,msup,maction,mtext}
-  }
-}
-\def\lsthtml{
-\lstset{language=html,
-    basicstyle=\scriptsize,
-    keywordstyle=\bfseries\ttfamily,
-    showstringspaces=false,
-    % otherkeywords={mfenced, open, close, separators, mrow, mi, mo, mn, math, 
-    %   msup, role, parent, children, added}
-}
-}
-
-\def\latex{\LaTeX}
-
 
 \begin{document}
-% \CopyrightYear{2016} 
-% \setcopyright{acmcopyright}
-% \conferenceinfo{Assets,}{}
-% \isbn{}}\acmPrice{\$15.00}
-% \doi{}
-
 
 \title{Supporting Visual Impaired Learners in Editing Mathematics}
-%\subtitle{Extended Abstract}
   
 
 \numberofauthors{3}
 \author{
-  % \alignauthor {T.V. Raman}\\
-  % \affaddr{Google, Inc.}\\
-  % \affaddr{Mountain View, CA}\\
-  % \email{\normalsize raman@google.com}
-  %
   \alignauthor{Volker Sorge}\\
   \affaddr{Progressive Accessibility Solutions, Ltd.}\\
   \affaddr{University of Birmingham, UK}\\
   \email{\normalsize V.Sorge@progressiveaccess.com}\\
-  %% Thanks does not seem to work.
 }
 
 \maketitle
@@ -99,7 +50,6 @@
 \keywords{STEM Accessibility, Mathematics, MathJax}
 
 
-\enlargethispage{10pt}
 \section{Introduction}
 
 
@@ -271,13 +221,6 @@ the summarisation features \sre provides. For example, instead of reading a
 complete expression, \sre can use its semantic interpretation to produce
 summaries such as ``sum with 5 summands'', which are only expanded when
 explicitly prompted by a user, thus shortening aural output while editing.
-
-% Emacspeak uses this during editing of single
-% expressions.
-
-% When the same expression is rendered multiple times, \sre can keep
-% an internal state of the expression allowing it to simply summarise
-% sub-expressions that have not been changed since the last editing state.
 
 \subsection*{Acknowledgements}
 
